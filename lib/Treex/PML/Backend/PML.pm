@@ -4,10 +4,12 @@ use Treex::PML;
 use Treex::PML::IO qw(close_backend);
 use strict;
 use warnings;
+use File::ShareDir;
+use File::Spec;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.02'; # version template
+  $VERSION='2.03'; # version template
 }
 
 use Treex::PML::Instance qw( :all :diagnostics $DEBUG );
@@ -29,47 +31,60 @@ BEGIN {
   $allow_no_trees = 0;
 }
 
-sub _caller_dir {
-  return File::Spec->catpath(
-    (File::Spec->splitpath( (caller)[1] ))[0,1],''
-  );
+sub configure {
+  my @resource_path = Treex::PML::ResourcePaths();
+  my $ret = eval { _configure() };
+  my $err = $@;
+  Treex::PML::SetResourcePaths(@resource_path);
+  die $err if ($err);
+  $config = $ret;
+  return $ret;
 }
 
-sub configure {
-  return 0 unless eval {
-    require XML::LibXSLT;
-  };
-  undef $config;
-  my @resource_path = Treex::PML::ResourcePaths();
-  Treex::PML::AddResourcePath(_caller_dir());
+sub _configure {
+  my $cfg;
+  my $schema_dir = eval { File::ShareDir::module_dir('Treex::PML') };
+  unless (defined($schema_dir) and length($schema_dir) and -f File::Spec->catfile($schema_dir,'pmlbackend_conf_schema.xml')) {
+    $schema_dir = Treex::PML::IO::CallerDir(File::Spec->catfile(qw(.. share)));
+  }
+  Treex::PML::AddResourcePath($schema_dir) if defined($schema_dir) and length($schema_dir);
   my $file = Treex::PML::FindInResources($config_file,{strict=>1});
   if ($file and -f $file) {
     _debug("config file: $file");
-    $config = Treex::PML::Instance->load({filename => $file});
+    $cfg = Treex::PML::Instance->load({filename => $file});
+  } else {
+    _debug("using empty pmlbackend_conf.xml file");
+    $cfg = Treex::PML::Instance->load({string=><<'_CONFIG_',filename => $file});
+<?xml version="1.0" encoding="UTF-8"?>
+<pmlbackend xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
+  <head><schema href="pmlbackend_conf_schema.xml"/></head>
+  <transform_map/>
+</pmlbackend>
+_CONFIG_
   }
-  return unless $config;
-  my @config_files = Treex::PML::FindInResources($config_inc_file,{all=>1});
-  my $T = $config->get_root->{transform_map} ||= Treex::PML::Factory->createSeq();
-  for my $file (reverse @config_files) {
-    _debug("config include file: $file");
-    eval {
-      my $c = Treex::PML::Instance->load({filename => $file});
-      # merge
-      my $t = $c->get_root->{transform_map};
-      if ($t) {
-	for my $transform (reverse $t->elements) {
-	  my $copy = Treex::PML::CloneValue($transform);
-	  $T->unshift_element_obj($copy);
-	  if (ref($copy->value) and $copy->value->{id}) {
-	    $config->hash_id($copy->value->{id}, $copy->value, 1);
+  if ($cfg) {
+    my @config_files = Treex::PML::FindInResources($config_inc_file,{all=>1});
+    my $T = $cfg->get_root->{transform_map} ||= Treex::PML::Factory->createSeq();
+    for my $file (reverse @config_files) {
+      _debug("config include file: $file");
+      eval {
+	my $c = Treex::PML::Instance->load({filename => $file});
+	# merge
+	my $t = $c->get_root->{transform_map};
+	if ($t) {
+	  for my $transform (reverse $t->elements) {
+	    my $copy = Treex::PML::CloneValue($transform);
+	    $T->unshift_element_obj($copy);
+	    if (ref($copy->value) and $copy->value->{id}) {
+	      $cfg->hash_id($copy->value->{id}, $copy->value, 1);
+	    }
 	  }
 	}
-      }
-    };
-    warn $@ if $@;
+      };
+      warn $@ if $@;
+    }
   }
-  Treex::PML::SetResourcePaths(@resource_path);
-  return $config;
+  return $cfg;
 }
 
 

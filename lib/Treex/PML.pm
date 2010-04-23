@@ -16,7 +16,7 @@ package Treex::PML;
 use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION $API_VERSION %COMPATIBLE_API_VERSION
             $FSError $Debug $resourcePath $resourcePathSplit @BACKENDS);
 BEGIN {
-$VERSION = "2.02";        # change when new functions are added etc
+$VERSION = "2.03";        # change when new functions are added etc
 }
 
 
@@ -58,7 +58,7 @@ $API_VERSION = "2.0";    # change when internal data structures change,
 @EXPORT = qw/&ImportBackends/;
 @EXPORT_OK = qw/&Next &Prev &Cut &DeleteLeaf $FSError &Index &SetParent &SetLBrother &SetRBrother &SetFirstSon &Paste &Parent &LBrother &RBrother &FirstSon ResourcePaths FindInResources FindInResourcePaths FindDirInResources FindDirInResourcePaths ResolvePath &CloneValue AddResourcePath AddResourcePathAsFirst SetResourcePaths RemoveResourcePath UseBackends AddBackends Backends /;
 
-$Debug=0;
+$Debug=$ENV{TREEX_PML_DEBUG}||0;
 *DEBUG = \$Debug;
 
 $resourcePathSplit = ($^O eq "MSWin32") ? ',' : ':';
@@ -202,6 +202,10 @@ sub Index ($$) {
 sub _is_url {
   return ($_[0] =~ m(^\s*[[:alnum:]]+://)) ? 1 : 0;
 }
+sub _is_updir {
+  my $uri = Treex::PML::IO::make_URI($_[0]);
+  return ($uri->path =~  m{(/|^)\.\.($|/)} ? 1 : 0);
+}
 sub _is_absolute {
   my ($path) = @_;
   return (_is_url($path) or File::Spec->file_name_is_absolute($path));
@@ -209,7 +213,7 @@ sub _is_absolute {
 
 sub FindDirInResources {
   my ($filename)=@_;
-  unless (_is_absolute($filename)) {
+  unless (_is_absolute($filename) and _is_updir($filename)) {
     for my $dir (ResourcePaths()) {
       my $f = File::Spec->catfile($dir,$filename);
       return $f if -d $f;
@@ -225,7 +229,7 @@ sub FindInResources {
   my ($filename,$opts)=@_;
   my $all = ref($opts) && $opts->{all};
   my @matches;
-  unless (_is_absolute($filename)) {
+  unless (_is_absolute($filename) or _is_updir($filename)) {
     for my $dir (ResourcePaths()) {
       my $f = File::Spec->catfile($dir,$filename);
       if (-f $f) {
@@ -241,7 +245,7 @@ BEGIN {
 *FindInResourcePaths = \&FindInResources;
 }
 sub ResourcePaths {
-  return undef unless defined $resourcePath;
+  return unless defined $resourcePath;
   return wantarray ? split(/\Q${resourcePathSplit}\E/, $resourcePath) : $resourcePath;
 }
 BEGIN { *ResourcePath = \&ResourcePaths; } # old name
@@ -269,9 +273,13 @@ sub SetResourcePaths {
   $resourcePath=join $resourcePathSplit,@_;
 }
 
+sub _is_local {
+  my ($url) = @_;
+  return (((blessed($url) && $url->isa('URI') && (($url->scheme||'file') eq 'file')) or $url =~ m{^file:/}) ? 1 : 0);
+}
 sub _strip_file_prefix {
   my $url = $_[0]; # ARGUMENT WILL GET MODIFIED
-  if ((blessed($url) && $url->isa('URI') && (($url->scheme||'file') eq 'file')) or $url =~ m{^file:/}) {
+  if (_is_local($url)) {
       $_[0] = Treex::PML::IO::get_filename($url);
       return 1;
   } else {
@@ -280,56 +288,38 @@ sub _strip_file_prefix {
 }
 
 sub ResolvePath ($$;$) {
-  my ($orig, $href,$use_resources)=@_;
-  print STDERR "ResolvePath: '$href' base='$orig' use_resources=$use_resources\n" if $Treex::PML::Debug;
-  my $href_was_file_url = _strip_file_prefix($href);
-  print STDERR "ResolvePath: url: $href_was_file_url, modified_href=$href\n" if $Treex::PML::Debug;
-  unless (_is_absolute($href)) {
-    my $orig_was_file_url = _strip_file_prefix($orig);
-    print STDERR "ResolvePath: orig_url: $orig_was_file_url, modified_orig=$orig\n" if $Treex::PML::Debug;
-    if (_is_url($orig)) {
-      print STDERR "ResolvePath: relative path from an URL (will try resources first)\n" if $Treex::PML::Debug;
-      #
-      # a relative path from an URL
-      #
-      # 1st look into the resources
-      #
-      if ($use_resources) {
-	my $res = FindInResources($href);
-	if ($res ne $href) {
-	  print STDERR "ResolvePath: (URL-resources) result='$res'\n" if $Treex::PML::Debug;
-	  return $res;
-	}
-      }
-      #
-      # 2nd: absolutize $href w.r.t. to base $orig
-      #
-      $orig = URI->new($orig) unless (blessed($orig) and $orig->isa('URI'));
-      $href = URI->new($href) unless (blessed($href) and $href->isa('URI'));
-      $orig = $href->abs($orig);
-      print STDERR "ResolvePath: (URL) result='$orig'\n" if $Treex::PML::Debug;
-      return $orig;
-    } else {
-      my ($vol,$dir) = File::Spec->splitpath(File::Spec->rel2abs($orig));
-      my $rel = File::Spec->rel2abs($href,File::Spec->catfile(grep length, $vol,$dir));
-      print STDERR "ResolvePath: trying rel: $rel, based on: ",File::Spec->catfile(grep length, $vol,$dir),"\n" 
-	if $Treex::PML::Debug;
-      if (-f $rel) {
-	$rel = URI::file->new($rel) if $orig_was_file_url;
-	print STDERR "ResolvePath: (1) result='$rel'\n" if $Treex::PML::Debug;
-	return $rel;
-      } elsif (-f $href) {
-	print STDERR "ResolvePath: (2) result='$href'\n" if $Treex::PML::Debug;
-	return $href;
+  my ($base, $href,$use_resources)=@_;
+
+  my $rel_uri = Treex::PML::IO::make_URI($href);
+  my $base_uri = Treex::PML::IO::make_abs_URI($base);
+  print STDERR "ResolvePath: rel='$rel_uri', base='$base_uri'\n" if $Treex::PML::Debug;
+  my $abs_uri = $rel_uri->abs($base_uri);
+
+  if (_is_absolute($rel_uri)) {
+    return $rel_uri;
+  } elsif (_is_updir($rel_uri)) {
+    return _is_url($base) ? $abs_uri : Treex::PML::IO::get_filename($abs_uri);
+  } else {
+    my $abs_f = Treex::PML::IO::get_filename($abs_uri);
+    my $rel_f = Treex::PML::IO::get_filename($rel_uri);
+    if (_is_local($base_uri)) {
+      if (-f $abs_f) {
+	print STDERR "\t=> (LocalURL-relative) result='$abs_f'\n" if $Treex::PML::Debug;
+	return _is_url($base) ? $abs_uri : $abs_f;
+      } elsif ( not _is_url($base) ) { # base was a filename: try path relative to cwd
+	print STDERR "\t=> (cwd-relative) result='$rel_f'\n" if $Treex::PML::Debug;
+	return $rel_f if -f $rel_f;
       }
     }
-    my $result = $use_resources ? FindInResources($href) : $href;
-    print STDERR "ResolvePath: (3) result='$result'\n" if $Treex::PML::Debug;
-    return $result;
-  } else {
-    $href = URI::file->new($href) if $href_was_file_url;
-    print STDERR "ResolvePath: (4) result='$href'\n" if $Treex::PML::Debug;
-    return $href;
+    if ($use_resources) {
+      my ($res) = FindInResources($rel_f,{strict=>1});
+      if ($res) {
+	print STDERR "\t=> (resources) result='$res'\n" if $Treex::PML::Debug;
+	return $res;
+      }
+    }
+    print STDERR "\t=> (relative) result='$abs_uri'\n" if $Treex::PML::Debug;
+    return _is_url($base) ? $abs_uri : $abs_f;
   }
 }
 
@@ -415,39 +405,66 @@ sub BackendCanWrite {
 
 __END__
 
-=head1 Treex::PML
+=head1 NAME
 
-Treex::PML.pm - library for tree processing
+Treex::PML - Perl implementation for the Prague Markup Language (PML).
 
 =head1 SYNOPSIS
 
-  use Treex::PML qw(ImportBackends);
+  use Treex::PML;
 
-  my @IObackends = ImportBackends(qw(PML Storable));
-
-  my $file="trees.fs";
-  my $fs = Treex::PML::Document->load($file,{ backends => \@IObackends });
-
-  if ($fs->lastTreeNo<0) { die "File is empty or corrupted!\n" }
-  foreach my $tree ($fs->trees) {
+  my $file="trees.pml";
+  my $document = Treex::PML::Factory->createDocumentFromFile($file);
+  foreach my $tree ($document->trees) {
      my $node = $tree;
      while ($node) {
        ...  # do something on node
        $node = $node->following; # depth-first traversal
      }
   }
-  $fs->writeFile("$file.out");
+  $document->save();
+
+=head1 INTRODUCTION
+
+This package provides API for manipulating linguistically annotated
+treebanks. The module implements a generic data-model of a XML-based
+format called PML (L<http://ufal.mff.cuni.cz/jazz/PML/>) and features
+pluggable I/O backends and on-the-fly XSLT transformation to support
+other data formats.
+
+=head2 About PML
+
+Prague Marup Language (PML) is an XML-based, universally applicable
+data format based on abstract data types intended primarily for
+interchange of linguistic annotations. It is completely independent of
+a particular annotation schema. It can capture simple linear
+annotations as well as annotations with one or more richly structured
+interconnected annotation layers, dependency or constituency trees. A
+concrete PML-based format for a specific annotation is defined by
+describing the data layout and XML vocabulary in a special file called
+PML Schema and referring to this schema file from individual data
+files (instances). The schema can be used to validate the
+instances. It is also used by applications to ``understand'' the
+structure of the data and to choose optimal in-memory
+representation. The generic nature of PML makes it very easy to
+convert data from other formats to PML without loss of information.
+
+=head2 History
+
+PML and was developed at the Institute of Formal and Applied
+Linguistics of the Charles University in Prague. It was first used in
+the Prague Dependency Treebank 2.0 and several other treebanks
+since. Conversion tools for various existing treebank formats are
+available, too.
+
+This library was originally developed for the TrEd framework
+(L<http://ufal.mff.cuni.cz/~pajas/tred>) and evolved gradually from an
+older library called Fslib, implementing an older data format called
+FS format L<http://ufal.mff.cuni.cz/pdt2.0/doc/data-formats/fs/index.html>
+(this format is still fully supported by the current
+implementation).
 
 =head1 DESCRIPTION
-
-=head2 Introduction
-
-This package provides API for manipulating treebank files.; originally
-only files in so-called FS format (designed by Michal Kren) were
-supported, but the current implementation features pluggable I/O
-backends for other data formats. The module implements a generic
-data-model of a XML-based format called PML
-(http://ufal.mff.cuni.cz/pdt/pml).
 
 Treex::PML provides among other the following classes:
 
@@ -779,8 +796,9 @@ C<$filename> - a relative path to a file
 
 =item Description
 
-If a given filename is a relative path of a file found in the resource
-paths, return:
+If a given filename is a relative forward path (e.g. containing no
+up-dir '..' directory parts) of a file found in the resource paths,
+return:
 
 If the option 'all' is true, a list of absolute paths to all
 occurrences found (may be empty).
@@ -834,20 +852,27 @@ Alias for C<FindDirInResourcePaths($filename)>.
 
 =item Parameters
 
-C<$ref_filename> - a reference filename
+C<$ref_path> - a reference filename
 
-C<$filename>     - a relative path to a file
+C<$filename> - a relative path to a file
 
 C<$search_resource_paths> - 0 or 1
 
 =item Description
 
-If a given filename is a relative path, try to find the file in the
-same directory as ref-filename. In case of success, return a path
-based on the directory part of ref-filename and filename.  If the file
-can't be located in this way and the C<$search_resource_paths>
-argument is true, return the value of
-C<FindInResourcePaths($filename)>.
+If the C<$filename> is an absolute path or an absolute URL, it is
+returned umodified. If it is a relative path and C<$ref_path> is a
+local path or a file:// URL, the function tries to locate the file
+relatively to C<$ref_path> and if such a file exists, returns an
+absolute filename or file:// URL to the file. Otherwise, returns the
+value of C<FindInResourcePaths($filename)> if the
+C<$search_resource_paths> argument was true or absolute path or URL
+resolved relatively to C<ref_path> otherwise.
+
+The rationale behind this function is as follows: paths that are
+relative to remote resources are to be preferably located in
+ResourcePaths; paths that are relative to a local resource are
+preferably located in the actual location and then in ResourcePaths.
 
 =back
 

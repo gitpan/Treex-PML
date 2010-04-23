@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use UNIVERSAL::DOES;
 
 BEGIN {
-  our $VERSION = '2.02'; # version template
+  our $VERSION = '2.03'; # version template
 }
 use List::Util qw(first);
 use Treex::PML::Instance::Common qw(:diagnostics :constants);
@@ -175,13 +175,14 @@ sub save {
       if ($out_xsl->{'type'} ne 'xslt') {
 	die(__PACKAGE__.": unsupported output transformation $transform_id (only type='xslt') transformations are supported)");
       }
-      my $out_xsl_href = URI->new(Encode::encode_utf8($out_xsl->get_member('href')));
+      $out_xsl_href = URI->new(Encode::encode_utf8($out_xsl->get_member('href')));
       $out_xsl_href = Treex::PML::ResolvePath($config->{_filename}, $out_xsl_href, 1);
       unless (defined $out_xsl_href and length $out_xsl_href) {
 	die(__PACKAGE__.": no output transformation defined for $transform_id");
       }
       $orig_fh = $fh;
-      open $fh, '>', \$xsl_source;
+      open(my $pml_fh, '>', \$xsl_source) or die "Cannot open scalar for writing!";
+      $fh=$pml_fh;
     } else {
       die(__PACKAGE__.": Couldn't find PML transform with ID $transform_id");
     }

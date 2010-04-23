@@ -6,7 +6,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.02'; # version template
+  $VERSION='2.03'; # version template
 }
 use Carp;
 
@@ -71,7 +71,7 @@ BEGIN {
 1;
 __END__
 
-=head1 Treex::PML::Schema::Constants
+=head1 NAME
 
 Treex::PML::Schema::Constants - constants used by the Treex::PML::Schema modules
 

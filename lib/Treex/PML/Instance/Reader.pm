@@ -11,7 +11,7 @@ use Carp;
 use Data::Dumper;
 
 BEGIN {
-  our $VERSION = '2.02'; # version template
+  our $VERSION = '2.03'; # version template
 }
 use List::Util qw(first);
 use Scalar::Util qw(weaken);
@@ -240,7 +240,7 @@ sub load {
   my $root_ns = $reader->namespaceURI || '';
   if ($root_ns ne PML_NS
 	or grep { (($_->{ns}||'') eq PML_NS and ($_->{root}||'') eq $root_element) } @transform_map) {
-    if ($config and $config->{'_root'} and eval { require XML::LibXSLT; 1 }) {
+    if ($config and $config->get_root and eval { require XML::LibXSLT; 1 }) {
       # TRANSFORM
       $reader->preserveNode;
       $reader->finish;
@@ -519,7 +519,7 @@ sub read_header {
 		}
 		# Encode: all filenames must(!) be bytes
 		$references{ $id } = Treex::PML::ResolvePath($ctxt->{'_filename'},
-							URI->new(Encode::encode_utf8($href)),0);
+							URI->new(Encode::encode_utf8($href)),$opts->{use_resources});
 	      } else {
 		warn "Missing id or href attribute on a <reffile>: ignoring\n";
 	      }

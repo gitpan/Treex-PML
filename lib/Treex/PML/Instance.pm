@@ -75,7 +75,7 @@ $EXPORT_TAGS{'all'} = [ @{ $EXPORT_TAGS{'constants'} },
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(  );
-our $VERSION = '2.02'; # version template
+our $VERSION = '2.03'; # version template
 
 BEGIN {
 require Treex::PML::IO;
@@ -278,14 +278,14 @@ sub readas_dom {
   my ($ctxt,$refid,$href,$opts)=@_;
   # embed DOM documents
   my $ref_data;
-  if ($opts and $opts->{use_resources}) {
-    $href = Treex::PML::FindInResourcePaths($href);
-  }
+  # if ($opts and $opts->{use_resources}) {
+  #   $href = Treex::PML::FindInResourcePaths($href);
+  # }
 
   my ($local_file,$remove_file) = Treex::PML::IO::fetch_file($href);
   my $ref_fh = Treex::PML::IO::open_uri($local_file);
   _die("Cannot open $href for reading") unless $ref_fh;
-  _debug("readas_dom: $refid => $href, $ref_fh");
+  _debug("readas_dom: $refid => $href");
   my $parser = $ctxt->{'_parser'} || $ctxt->_xml_parser();
   if ($ref_fh){
     eval {

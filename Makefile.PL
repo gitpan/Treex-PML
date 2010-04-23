@@ -7,9 +7,9 @@ WriteMakefile
           'VERSION_FROM' => 'lib/Treex/PML.pm',
           'PREREQ_PM' => {
                            'File::ShareDir' => '1.00',
-                           'File::Temp' => '0.14',
                            'File::Which' => '0',
                            'IO::Zlib' => '0',
+                           'Module::Build' => '0.36',
                            'Test::More' => '0',
                            'UNIVERSAL::DOES' => '0.004',
                            'XML::CompactTree' => '0.03',

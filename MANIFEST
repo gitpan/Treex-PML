@@ -10,7 +10,6 @@ lib/Treex/PML/Backend/CSTS/share/csts.doctype
 lib/Treex/PML/Backend/FS.pm
 lib/Treex/PML/Backend/NTRED.pm
 lib/Treex/PML/Backend/PML.pm
-lib/Treex/PML/Backend/pmlbackend_conf_schema.xml
 lib/Treex/PML/Backend/PMLTransform.pm
 lib/Treex/PML/Backend/Storable.pm
 lib/Treex/PML/Backend/TEIXML.pm
@@ -50,6 +49,7 @@ lib/Treex/PML/Schema/Type.pm
 lib/Treex/PML/Schema/XMLNode.pm
 lib/Treex/PML/Seq.pm
 lib/Treex/PML/Seq/Element.pm
+lib/Treex/PML/share/pmlbackend_conf_schema.xml
 lib/Treex/PML/StandardFactory.pm
 lib/Treex/PML/Struct.pm
 Makefile.PL
@@ -60,10 +60,17 @@ t/00-load.t
 t/01-pml.t
 t/02-csts.t
 t/03-fs.t
+t/04-xslt.t
 t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+test_data/alpino/18.xml
+test_data/alpino/alpino2pml.xsl
+test_data/alpino/alpino_schema.xml
+test_data/alpino/pml2alpino.xsl
+test_data/alpino/pmlbackend_conf.inc
+test_data/alpino/README
 test_data/csts/ca01.am.gz
 test_data/fs/ca01am.fs
 test_data/pdt/adata_schema.xml

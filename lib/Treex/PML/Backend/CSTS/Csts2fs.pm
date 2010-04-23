@@ -1,8 +1,8 @@
-package Csts2fs;
+package Treex::PML::Backend::CSTS::Csts2fs;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.02'; # version template
+  $VERSION='2.03'; # version template
 }
 use Treex::PML;
 

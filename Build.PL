@@ -29,18 +29,19 @@ my $builder = $class->new(
     share_dir => {
       module => {
 	'Treex::PML::Backend::CSTS' => 'lib/Treex/PML/Backend/CSTS/share',
+	'Treex::PML' => 'lib/Treex/PML/share',
       },
     },
 
     requires => {
       'perl' => '5.8.0',
-      'File::Temp' => '0.14',
       'File::Which' => 0,
       'IO::Zlib' => 0,
       'UNIVERSAL::DOES' => '0.004',
       'XML::CompactTree' => '0.03',
       'XML::LibXML' => '1.69',
       'XML::Writer' => '0.606',
+      'File::ShareDir' => '1.00',
     },
     recommends => {
       'XML::LibXSLT' => '1.69',
@@ -48,6 +49,7 @@ my $builder = $class->new(
     },
     build_requires => {
         'Test::More' => 0,
+        'Module::Build' => '0.36',
     },
     add_to_cleanup      => [ 'Treex-PML-*' ],
     create_makefile_pl => 'traditional',

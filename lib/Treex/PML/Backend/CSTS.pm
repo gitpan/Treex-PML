@@ -2,13 +2,13 @@ package Treex::PML::Backend::CSTS;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.02'; # version template
+  $VERSION='2.03'; # version template
 }
 
 use Treex::PML;
 use Treex::PML::IO qw(set_encoding);
-require Treex::PML::Backend::CSTS::Csts2fs;
-require Treex::PML::Backend::CSTS::Fs2csts;
+use Treex::PML::Backend::CSTS::Csts2fs;
+use Treex::PML::Backend::CSTS::Fs2csts;
 use Fcntl qw(SEEK_SET);
 use File::ShareDir;
 
@@ -89,11 +89,11 @@ sub close_backend {
 }
 
 sub read {
-  Csts2fs::read(@_);
+  Treex::PML::Backend::CSTS::Csts2fs::read(@_);
 }
 
 sub write {
-  Fs2csts::write(@_);
+  Treex::PML::Backend::CSTS::Fs2csts::write(@_);
 }
 
 sub test_nsgmls {

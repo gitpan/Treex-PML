@@ -1,7 +1,11 @@
 Revision history for Treex-PML
 
+2.03    Fri Apr 23 08:56:17 2010
+        Fixed a bug in relative URL resolving revealed on MSWin32 platform
+	Minor fixes: build, compatibility, documentation, nest Fs2csts
+	and Csts2fs into Treex::PML namespace properly
+
 2.01    Mon Apr 19 16:15:35 2010
         First version released on an unsuspecting world
 	(ported from a library originally called Fslib and used
 	internally in the tree editor TrEd).
-

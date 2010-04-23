@@ -153,7 +153,11 @@ example9.xml
   my $expected_ref_url = Treex::PML::ResolvePath(Treex::PML::IO::make_abs_URI($file),'example6.xml');
 
   my $doc = Treex::PML::Factory->createDocumentFromFile($file);
-  is($doc->referenceURLHash()->{t}, $expected_ref_url,"resolved URL");
+  if ($^O eq 'MSWin32') {
+    is(lc($doc->referenceURLHash()->{t}), lc($expected_ref_url),"resolved URL");
+  } else {
+    is($doc->referenceURLHash()->{t}, $expected_ref_url,"resolved URL");
+  }
   is ($doc->referenceNameHash()->{tokenization},'t','reference name maps to reference id');
   is (ref($doc->referenceObjectHash()->{t}),'XML::LibXML::Document','DOM reference read as XML::LibXML::DOM');
 }
@@ -169,8 +173,16 @@ sample0.a
   my $doc = Treex::PML::Factory->createDocumentFromFile($file);
   ok(Treex::PML::does($doc->schema,'Treex::PML::Schema'),'has schema');
   is($doc->schemaURL,'adata_schema.xml','remembers unresolved schema URL');
-  is($doc->schema->get_url,$expected_schema_url,'whereas Schema remembers the URL resloved');
-  is($doc->referenceURLHash()->{'m'}, $expected_m_ref_url,"resolved URL");
+  if ($^O eq 'MSWin32') {
+    is(lc($doc->schema->get_url),lc($expected_schema_url),'whereas Schema remembers the URL resloved');
+  } else {
+    is($doc->schema->get_url,$expected_schema_url,'whereas Schema remembers the URL resloved');
+  }
+  if ($^O eq 'MSWin32') {
+    is(lc($doc->referenceURLHash()->{'m'}),lc($expected_m_ref_url),"resolved URL");
+  } else {
+    is($doc->referenceURLHash()->{'m'}, $expected_m_ref_url,"resolved URL");
+  }
   is ($doc->referenceNameHash()->{mdata},'m','reference name maps to reference id');
   is (ref($doc->referenceObjectHash()->{'m'}),'Treex::PML::Instance','PML reference read as Treex::PML::Instance');
 
@@ -189,7 +201,11 @@ sample0.t
   my $expected_m_ref_url = Treex::PML::ResolvePath(Treex::PML::IO::make_abs_URI($file),'sample0.a');
 
   my $doc = Treex::PML::Factory->createDocumentFromFile($file);
-  is($doc->referenceURLHash()->{'a'}, $expected_m_ref_url,"resolved URL");
+  if ($^O eq 'MSWin32') {
+    is(lc($doc->referenceURLHash()->{'a'}), lc($expected_m_ref_url),"resolved URL");
+  } else {
+    is($doc->referenceURLHash()->{'a'}, $expected_m_ref_url,"resolved URL");
+  }
   is ($doc->referenceNameHash()->{adata},'a','reference name maps to reference id');
   is ($doc->referenceObjectHash()->{'a'},undef,"tree document references not loaded by default");
   my @loaded = $doc->loadRelatedDocuments();
