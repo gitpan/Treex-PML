@@ -11,7 +11,7 @@ use Carp;
 use Data::Dumper;
 
 BEGIN {
-  our $VERSION = '2.03'; # version template
+  our $VERSION = '2.04'; # version template
 }
 use List::Util qw(first);
 use Scalar::Util qw(weaken);
@@ -518,8 +518,12 @@ sub read_header {
 		  }
 		}
 		# Encode: all filenames must(!) be bytes
-		$references{ $id } = Treex::PML::ResolvePath($ctxt->{'_filename'},
-							URI->new(Encode::encode_utf8($href)),$opts->{use_resources});
+		$references{$id} = Treex::PML::ResolvePath
+                  ($ctxt->{'_filename'},
+                   URI->new(Encode::encode_utf8($href)),
+                   $opts->{use_resources});
+                # Resources are not used for non-readas references,
+                # though, they must be handled manually.
 	      } else {
 		warn "Missing id or href attribute on a <reffile>: ignoring\n";
 	      }

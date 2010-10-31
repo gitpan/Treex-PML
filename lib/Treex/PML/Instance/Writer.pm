@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use UNIVERSAL::DOES;
 
 BEGIN {
-  our $VERSION = '2.03'; # version template
+  our $VERSION = '2.04'; # version template
 }
 use List::Util qw(first);
 use Treex::PML::Instance::Common qw(:diagnostics :constants);
@@ -306,7 +306,7 @@ sub save {
 	  }
 	  $pml->save({ %$opts,
 		       refs_save=>{
-			 map { my $k=$_; $k=~s{^\Q$ref_id\E/}{} ? ($k=>$refs_to_save->{$_}) : ()  }  keys %$refs_to_save
+			 map { my $k=$_; $k=~s%^\Q$ref_id\E/%% ? ($k=>$refs_to_save->{$_}) : ()  }  keys %$refs_to_save
 		       },
 		       filename => $href, fh=>undef });
 	}

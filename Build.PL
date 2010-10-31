@@ -4,10 +4,7 @@ use Module::Build;
 
 # Build.PL
 
-my $class = Module::Build->subclass(
-  class => "Module::Build::Custom",
-  code => <<'SUBCLASS' );
-
+my $subclass_code = <<'SUBCLASS';
   # update version number of all packages in the distribution
   sub ACTION_version {
     my $self = shift;
@@ -19,10 +16,16 @@ my $class = Module::Build->subclass(
   }
 SUBCLASS
 
+$subclass_code.= q[sub manpage_separator {'.'}] if ($ENV{NO_COLONS_IN_FILENAMES});
+
+my $class = Module::Build->subclass(
+  class => "Module::Build::Custom",
+  code => $subclass_code );
+
 my $builder = $class->new(
     module_name         => 'Treex::PML',
     license             => 'perl',
-    dist_abstract	=> 'Perl implementation of the Prague Marup Language (PML) and related data models.',
+    dist_abstract	=> 'Perl implementation of the Prague Markup Language (PML) and related data models.',
     dist_author         => q{Petr Pajas <pajas@matfyz.cz>},
     dist_version_from   => 'lib/Treex/PML.pm',
 
@@ -35,6 +38,7 @@ my $builder = $class->new(
 
     requires => {
       'perl' => '5.8.0',
+      'URI' => '1.35',
       'File::Which' => 0,
       'IO::Zlib' => 0,
       'UNIVERSAL::DOES' => '0.004',

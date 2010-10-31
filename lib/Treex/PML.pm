@@ -16,7 +16,7 @@ package Treex::PML;
 use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION $API_VERSION %COMPATIBLE_API_VERSION
             $FSError $Debug $resourcePath $resourcePathSplit @BACKENDS);
 BEGIN {
-$VERSION = "2.03";        # change when new functions are added etc
+$VERSION = "2.04";        # change when new functions are added etc
 }
 
 
@@ -319,7 +319,11 @@ sub ResolvePath ($$;$) {
       }
     }
     print STDERR "\t=> (relative) result='$abs_uri'\n" if $Treex::PML::Debug;
-    return _is_url($base) ? $abs_uri : $abs_f;
+# The following line has been changed. The resources are handled
+# lazily, i.e. relative URL is returned on not found files to be
+# searched in resources later. Original line:
+#   return _is_url($base) ? $abs_uri : $abs_f;
+    return _is_local($base) ?  $rel_uri : $abs_uri;
   }
 }
 
@@ -592,7 +596,7 @@ C<@backends>  - a list of backend names
 
 Demand loading and using the given modules as the initial set of I/O
 backends. The initial set of backends is returned by C<Backends()>.
-This set is used as the default set of backends by C<<<Treex::PML::Document->load>>>
+This set is used as the default set of backends by C<<< Treex::PML::Document->load >>>
 (unless a different list of backends was specified in a parameter).
 
 =item Returns
@@ -630,7 +634,7 @@ A list of backends already available or sucessfully loaded.
 =item Description
 
 Returns the initial set of backends.  This set is used as the default
-set of backends by C<<<Treex::PML::Document->load>>>.
+set of backends by C<<< Treex::PML::Document->load >>>.
 
 =item Returns
 

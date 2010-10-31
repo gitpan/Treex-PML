@@ -12,7 +12,7 @@ use Carp;
 use Treex::PML::Schema::Constants;
 
 BEGIN {
-  our $VERSION = '2.03'; # version template
+  our $VERSION = '2.04'; # version template
   require Exporter;
   import Exporter qw(import);
   our @EXPORT = (
@@ -1219,7 +1219,7 @@ sub _get_paths_to_atoms {
 =item $schema->attributes (decl...)
 
 This function tries to emulate the behavior of
-C<<<Treex::PML::FSFormat->attributes>>> to some extent.
+C<<< Treex::PML::FSFormat->attributes >>> to some extent.
 
 Return attribute paths to all atomic subtypes of given type
 declarations. If no type declaration objects are given, then types

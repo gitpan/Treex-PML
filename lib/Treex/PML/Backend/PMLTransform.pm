@@ -2,7 +2,7 @@ package Treex::PML::Backend::PMLTransform;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.03'; # version template
+  $VERSION='2.04'; # version template
 }
 
 use Treex::PML::Backend::PML qw(open_backend close_backend read write);
@@ -22,12 +22,12 @@ Treex::PML::Backend::PMLTransform - I/O backend implementing on-the-fly XML to P
 
 =head1 SYNOPSIS
 
-use Treex::PML;
-Treex::PML::AddBackends(qw(PMLTransform))
+  use Treex::PML;
+  Treex::PML::AddBackends(qw(PMLTransform))
 
-my $document = Treex::PML::Factory->createDocumentFromFile('input.xml');
-...
-$document->save();
+  my $document = Treex::PML::Factory->createDocumentFromFile('input.xml');
+  ...
+  $document->save();
 
 =head1 DESCRIPTION
 

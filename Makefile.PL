@@ -12,6 +12,7 @@ WriteMakefile
                            'Module::Build' => '0.36',
                            'Test::More' => '0',
                            'UNIVERSAL::DOES' => '0.004',
+                           'URI' => '1.35',
                            'XML::CompactTree' => '0.03',
                            'XML::LibXML' => '1.69',
                            'XML::Writer' => '0.606'

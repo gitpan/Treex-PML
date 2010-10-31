@@ -6,7 +6,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.03'; # version template
+  $VERSION='2.04'; # version template
 }
 use UNIVERSAL::DOES;
 use Scalar::Util qw(blessed reftype refaddr);
@@ -106,6 +106,8 @@ sub upgrade_from_fslib {
       if ($is =~ /^Treex/) {
       } elsif ($is eq 'FSNode') {
 	bless $object, 'Treex::PML::Node';
+      } elsif ($is eq 'Fslib::Type') {
+	bless $object, 'Treex::PML::Backend::Storable::CopmpatType';
       } elsif ($is =~ /^Fslib::(.*)$/) {
 	bless $object, qq{Treex::PML::$1};
       } elsif ($is =~ /^PMLSchema(::.*)?$/) {
@@ -126,6 +128,31 @@ sub upgrade_from_fslib {
       push @next, $_ unless ($seen{$key}++);
     }
   }
+}
+
+package Treex::PML::Backend::Storable::CopmpatType;
+use Carp;
+use warnings;
+use strict;
+use vars qw($AUTOLOAD);
+# This is handler for obsoleted class 'Fslib::Type'
+# which has no API-compatible counterpart in Treex::PML.
+# The object is a pair (ARRAYref) containing PML schema and type declaration.
+sub schema {
+  my ($self)=@_;
+  return $self->[0];
+}
+sub type_decl {
+  my ($self)=@_;
+  return $self->[1];
+}
+# delegate every method to the type
+sub AUTOLOAD {
+  my $self = shift;
+  croak "$self is not an object" unless ref($self);
+  my $name = $AUTOLOAD;
+  $name =~ s/.*://;   # strip fully-qualified portion
+  return $self->[1]->$name(@_);
 }
 
 1;
