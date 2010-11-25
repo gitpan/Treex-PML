@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use UNIVERSAL::DOES;
 
 BEGIN {
-  our $VERSION = '2.04'; # version template
+  our $VERSION = '2.05'; # version template
 }
 use List::Util qw(first);
 use Treex::PML::Instance::Common qw(:diagnostics :constants);
@@ -547,14 +547,14 @@ sub compile_schema {
 	    $sub.=q`
               $v = $data->{'`.$attr->get_name.q`'};
               $v = '' unless defined $v;
-              $v =~ s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&guot;/g;
+              $v =~ s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
               print $out ' `.$attr->get_name.q`="'.$v.'"';
           `;
 	  } else {
 	    $sub.=q`
               $v = $data->{'`.$attr->get_name.q`'};
               if (defined($v) && length($v)) {
-                $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&guot;/g;
+                $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
                 print $out ' `.$attr->get_name.q`="'.$v.'"';
               }
           `;
@@ -575,7 +575,7 @@ sub compile_schema {
         $v = $ctxt->{'_schema-url'};
         if (defined $v and length $v) {
           $v=Treex::PML::IO::make_relative_URI($ctxt->{'_schema-url'},$ctxt->{'_filename'});
-          $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&guot;/g;
+          $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
           print $out qq(_^__^_<schema href="$v" />\n);
         } else {
           print $out qq(_^__^_<schema>\n);
@@ -637,14 +637,14 @@ sub compile_schema {
 	  $sub.=q`
               $v = $data->{'`.$name.q`'};
               $v='' unless defined $v;
-              $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&guot;/g;
+              $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
               print $out ' `.$name.q`'.'="'.$v.'"';
           `;
 	} else {
 	  $sub.=q`
               $v = $data->{'`.$name.q`'};
               if (defined($v) && length($v)) {
-                $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&guot;/g;
+                $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
                 print $out ' `.$name.q`'.'="'.$v.'"';
               }
           `;
@@ -860,14 +860,14 @@ sub compile_schema {
 	    $sub.=q`
            $v = $data->{'`.$name.q`'};
            $v='' unless defined $v;
-           $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&guot;/g;
+           $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
            print $out ' `.$name.q`'.'="'.$v.'"';
           `;
 	  } else {
 	    $sub.=q`
            $v = $data->{'`.$name.q`'};
            if (defined($v) && length($v)) {
-             $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&guot;/g;
+             $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
              print $out ' `.$name.q`'.'="'.$v.'"';
            }
           `;

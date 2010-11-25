@@ -9,7 +9,7 @@ use File::Spec;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.04'; # version template
+  $VERSION='2.05'; # version template
 }
 
 use Treex::PML::Instance qw( :all :diagnostics $DEBUG );
@@ -130,8 +130,21 @@ sub test {
     } else {
       # only accept PML instances
       # xmlns:...="..pml-namespace.." must occur in the first tag (on one line)
-      my ($in_first_tag,$in_pi,$in_comment);
+
+      # FIXME: the following code will fail for UTF-16 and UTF-32;
+      # proper fix would be to use XML::LibXML::Reader to read the
+      # first tag (performance impact on processing many files past
+      # PML backend to be measured). Another way to fix for UTF-16 is
+      # to check for UTF-16 BOM (both BE and LE) and decode
+      # accordingly if present; UTF-32 is rarely used and probably not
+      # worth fixing.
+      my ($in_first_tag,$in_pi,$in_comment, $past_BOM);
       while ($_=$f->getline()) {
+	unless ($past_BOM) {
+	  # ignore UTF-8 BOM
+	  s{^\x{ef}\x{bb}\x{bf}}{};
+	  $past_BOM = 1;
+	}
 	next if !/\S/;  # whitespace
 	if ($in_first_tag) {
 	  last if />/;

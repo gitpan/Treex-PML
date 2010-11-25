@@ -12,7 +12,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.04'; # version template
+  $VERSION='2.05'; # version template
 }
 use URI;
 use URI::file;
