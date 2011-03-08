@@ -1,5 +1,9 @@
 Revision history for Treex-PML
 
+2.06    Tue Mar 8 15:50:38 2011
+        bugfix: correctly test $@ when trying backends
+
+
 2.03    Fri Apr 23 08:56:17 2010
         Fixed a bug in relative URL resolving revealed on MSWin32 platform
 	Minor fixes: build, compatibility, documentation, nest Fs2csts

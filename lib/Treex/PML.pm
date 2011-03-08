@@ -16,7 +16,7 @@ package Treex::PML;
 use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION $API_VERSION %COMPATIBLE_API_VERSION
             $FSError $Debug $resourcePath $resourcePathSplit @BACKENDS);
 BEGIN {
-$VERSION = "2.05";        # change when new functions are added etc
+$VERSION = "2.06";        # change when new functions are added etc
 }
 
 
@@ -335,7 +335,7 @@ sub ImportBackends {
     for my $try (_BackendCandidates($backend)) {
       my $file = $try.'.pm';
       $file=~s{::}{/}g;
-      if ($::INC{$file} or eval { require $file; } ) {
+      if (eval { require $file; } or $::INC{$file}) {
 	$b=$backend;
 	last;
       }
@@ -343,9 +343,9 @@ sub ImportBackends {
     if ($b) {
       push @backends,$b;
     } else {
-      print STDERR "FAILED TO LOAD $backend\n";
+      warn $@ if $@;
+      warn "FAILED TO LOAD $backend\n";
     }
-    print STDERR $@ if ($@);
   }
   return @backends;
 }

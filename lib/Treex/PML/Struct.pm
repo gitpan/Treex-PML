@@ -20,7 +20,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.05'; # version template
+  $VERSION='2.06'; # version template
 }
 use strict;
 use UNIVERSAL::DOES;

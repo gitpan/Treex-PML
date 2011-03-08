@@ -21,7 +21,7 @@ $EXPORT_TAGS{'all'} = [
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(  );
-our $VERSION = '2.05'; # version template
+our $VERSION = '2.06'; # version template
 
 
 our $DEBUG = $ENV{PML_DEBUG}||0;

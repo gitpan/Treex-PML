@@ -6,7 +6,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.05'; # version template
+  $VERSION='2.06'; # version template
 }
 use Carp;
 use UNIVERSAL::DOES;
@@ -280,14 +280,14 @@ schema object).
 
 =item Treex::PML::Factory->createList($arrayRef?,$reuse?)
 
-Return a new alternative (object implementing the L<Treex::PML::List> interface),
+Return a new list (object implementing the L<Treex::PML::List> interface),
 populated with the values passed in the (optional) ArrayRef.
 If the C<$reuse> argument is true, the given ArrayRef may actually be
 reblessed into the target class (if supported by the implementation).
 
 =item Treex::PML::Factory->createAlt($arrayRef?,$reuse?)
 
-Return a new list (object implementing the L<Treex::PML::Alt> interface),
+Return a new alternative (object implementing the L<Treex::PML::Alt> interface),
 populated with the values passed in the (optional) ArrayRef.
 If the C<$reuse> argument is true, the given ArrayRef may actually be
 reblessed into the target class (if supported by the implementation).
