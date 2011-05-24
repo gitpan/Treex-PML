@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.06'; # version template
+  $VERSION='2.07'; # version template
 }
 use strict;
 use Treex::PML::List;

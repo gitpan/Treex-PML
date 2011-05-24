@@ -16,7 +16,7 @@ package Treex::PML;
 use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION $API_VERSION %COMPATIBLE_API_VERSION
             $FSError $Debug $resourcePath $resourcePathSplit @BACKENDS);
 BEGIN {
-$VERSION = "2.06";        # change when new functions are added etc
+$VERSION = "2.07";        # change when new functions are added etc
 }
 
 

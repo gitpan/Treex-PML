@@ -12,7 +12,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.06'; # version template
+  $VERSION='2.07'; # version template
 }
 
 sub open_backend {
@@ -181,7 +181,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.06'; # version template
+  $VERSION='2.07'; # version template
 }
 use Treex::PML;
 
