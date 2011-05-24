@@ -489,7 +489,7 @@ sub get_all {
 	    $1<0 ? $val->elements_list->[$1] : undef; # element
 	  $val ?
 	    (defined $2 and length $2) ?
-	      ($val->[0] eq $2) ? ($val) : ()
+	      ($val->[0] eq $2) ? ($val->[1]) : ()
 	    : $val->[1]
 	  :()
 	} elsif ($step =~ /^([^\[]+)(?:\[([-+]?\d+)\])?/) {

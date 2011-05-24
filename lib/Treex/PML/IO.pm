@@ -489,7 +489,7 @@ sub open_file {
     die if $@;
     return unless $fh;
     if ($rw eq 'w') {
-      print __PACKAGE__.": Storing ZIPTOFILE: $rw\n" if $Debug;
+      print STDERR __PACKAGE__.": Storing ZIPTOFILE: $rw\n" if $Debug;
       ${*$fh}{'ZIPTOFILE'}=$file;
     } else {
       my $tmp;
@@ -598,7 +598,7 @@ sub fetch_file {
 
 sub _fetch_cmd {
   my ($cmd, $filename)=@_;
-  print __PACKAGE__.": _fetch_cmd: $cmd\n" if $Debug;
+  print STDERR __PACKAGE__.": _fetch_cmd: $cmd\n" if $Debug;
   if (system($cmd." > ".$filename)==0) {
     return ($filename,1);
   } else {
@@ -633,7 +633,7 @@ sub _fetch_file_win32 {
 					    SUFFIX => (_is_gzip($uri) ? ".gz" : ""),
 					    UNLINK => 0,
 					   );
-  print STDERR "Fetching URI $uri as proto $proto to $filename\n" if $Debug;
+  print STDERR __PACKAGE__.": fetching URI $uri as proto $proto to $filename\n" if $Debug;
   if ($proto=~m(^https?|ftp|gopher|news)) {
     return _fetch_with_lwp($uri,$fh,$filename);
   }
@@ -642,22 +642,22 @@ sub _fetch_file_win32 {
 
 sub _fetch_file_posix {
   my ($uri,$proto)=@_;
-  print __PACKAGE__.": fetching file using protocol $proto ($uri)\n" if $Debug;
+  print STDERR __PACKAGE__.": fetching file using protocol $proto ($uri)\n" if $Debug;
   my ($fh,$tempfile) = File::Temp::tempfile("tredioXXXXXX",
 					    DIR => File::Spec->tmpdir(),
 					    SUFFIX => (_is_gzip($uri) ? ".gz" : ""),
 					    UNLINK => 0,
 					   );
-  print __PACKAGE__.": tempfile: $tempfile\n" if $Debug;
+  print STDERR __PACKAGE__.": tempfile: $tempfile\n" if $Debug;
   if ($proto=~m(^https?|ftp|gopher|news)) {
     return _fetch_with_lwp($uri,$fh,$tempfile);
   }
   close($fh);
   if ($ssh and -x $ssh and $proto =~ /^(ssh|fish|sftp)$/) {
-    print __PACKAGE__.": using plain ssh\n" if $Debug;
+    print STDERR __PACKAGE__.": using plain ssh\n" if $Debug;
     if ($uri =~ m{^\s*(?:ssh|sftp|fish):(?://)?([^-/][^/]*)(/.*)$}) {
       my ($host,$file) = ($1,$2);
-      print __PACKAGE__.": tempfile: $tempfile\n" if $Debug;
+      print STDERR __PACKAGE__.": tempfile: $tempfile\n" if $Debug;
       return
 	_fetch_cmd($ssh." ".$ssh_opts." ".quote_filename($host).
 	" /bin/cat ".quote_filename(quote_filename($file)),$tempfile);
@@ -666,7 +666,7 @@ sub _fetch_file_posix {
     }
   }
   if ($kioclient and -x $kioclient) {
-    print __PACKAGE__.": using kioclient\n" if $Debug;
+    print STDERR __PACKAGE__.": using kioclient\n" if $Debug;
     # translate ssh protocol to fish protocol
     if ($proto eq 'ssh') {
       ($uri =~ s{^\s*ssh:(?://)?([/:]*)[:/]}{fish://$1/});
@@ -696,7 +696,7 @@ sub _open_upload_pipe {
   } else {
     $cmd = $user_pipe."| $upload_pipe ";
   }
-  print __PACKAGE__.": upload: $cmd\n" if $Debug;
+  print STDERR __PACKAGE__.": upload: $cmd\n" if $Debug;
   open $fh, $cmd || undef $fh;
   return $fh;
 }
@@ -708,10 +708,10 @@ sub _get_upload_fh_win32 {
 
 sub _get_upload_fh_posix {
   my ($uri,$proto,$userpipe)=@_;
-  print __PACKAGE__.": uploading file using protocol $proto ($uri)\n" if $Debug;
+  print STDERR __PACKAGE__.": uploading file using protocol $proto ($uri)\n" if $Debug;
   return if $proto eq 'http' or $proto eq 'https';
   if ($ssh and -x $ssh and $proto =~ /^(ssh|fish|sftp)$/) {
-    print __PACKAGE__.": using plain ssh\n" if $Debug;
+    print STDERR __PACKAGE__.": using plain ssh\n" if $Debug;
     if ($uri =~ m{^\s*(?:ssh|sftp|fish):(?://)?([^-/][^/]*)(/.*)$}) {
       my ($host,$file) = ($1,$2);
       return _open_upload_pipe(_is_gzip($uri), $userpipe, "$ssh $ssh_opts ".
@@ -722,7 +722,7 @@ sub _get_upload_fh_posix {
     }
   }
   if ($kioclient and -x $kioclient) {
-    print __PACKAGE__.": using kioclient\n" if $Debug;
+    print STDERR __PACKAGE__.": using kioclient\n" if $Debug;
     # translate ssh protocol to fish protocol
     if ($proto eq 'ssh') {
       $uri =~ s{^\s*ssh:(?://)?([/:]*)[:/]}{fish://$1/};
@@ -798,9 +798,9 @@ sub _unlink_uri_posix {
   if ($proto eq 'file') {
     return unlink get_filename($uri);
   }
-  print __PACKAGE__.": unlinking file $uri using protocol $proto\n" if $Debug;
+  print STDERR __PACKAGE__.": unlinking file $uri using protocol $proto\n" if $Debug;
   if ($ssh and -x $ssh and $proto =~ /^(ssh|fish|sftp)$/) {
-    print __PACKAGE__.": using plain ssh\n" if $Debug;
+    print STDERR __PACKAGE__.": using plain ssh\n" if $Debug;
     if ($uri =~ m{^\s*(?:ssh|sftp|fish):(?://)?([^-/][^/]*)(/.*)$}) {
       my ($host,$file) = ($1,$2);
       return (system("$ssh $ssh_opts ".quote_filename($host)." /bin/rm ".
@@ -828,7 +828,7 @@ physical storage.
 =cut
 
 sub rename_uri {
-  print __PACKAGE__.": rename @_\n" if $Debug;
+  print STDERR __PACKAGE__.": rename @_\n" if $Debug;
   ($^O eq 'MSWin32') ? &_rename_uri_win32 : &_rename_uri_posix;
 }
 
@@ -858,9 +858,9 @@ sub _rename_uri_posix {
     return unless -f $uri1;
     return rename $uri1, get_filename($uri2);
   }
-  print __PACKAGE__.": rename file $uri1 to $uri2 using protocol $proto\n" if $Debug;
+  print STDERR __PACKAGE__.": rename file $uri1 to $uri2 using protocol $proto\n" if $Debug;
   if ($ssh and -x $ssh and $proto =~ /^(ssh|fish|sftp)$/) {
-    print __PACKAGE__.": using plain ssh\n" if $Debug;
+    print STDERR __PACKAGE__.": using plain ssh\n" if $Debug;
     if ($uri1 =~ m{^\s*(?:ssh|sftp|fish):(?://)?([^-/][^/]*)(/.*)$}) {
       my ($host,$file) = ($1,$2);
       if ($uri2 =~ m{^\s*(?:ssh|sftp|fish):(?://)?([^-/][^/]*)(/.*)$} and $1 eq $host) {
@@ -930,7 +930,7 @@ sub close_backend {
   if (ref($fh) eq 'File::Temp') {
     my $filename = ${*$fh}{'ZIPTOFILE'};
     if ($filename ne "") {
-      print __PACKAGE__.": Doing the real save to $filename\n" if $Debug;
+      print STDERR __PACKAGE__.": Doing the real save to $filename\n" if $Debug;
       seek($fh,0,SEEK_SET);
       require IO::Zlib;
       my $tmp = new IO::Zlib();

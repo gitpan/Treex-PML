@@ -569,12 +569,18 @@ sub compile_schema {
       print $out ">\n",
                  "_^_<head>\n";
       my $inline = $ctxt->{'_schema-inline'};
+
+      # remove /../ from filename, URI::rel gives strange results for base containing them
+      my $filename = $ctxt->{_filename};
+      $filename = $filename->path if ref $filename and index($filename,'file:/') == 0;
+      $filename = Cwd::realpath($filename) if -e $filename;
+
       if (defined $inline and length $inline) {
         print $out qq(_^__^_<schema>\n),$inline,qq(    </schema>\n);
       } else {
         $v = $ctxt->{'_schema-url'};
         if (defined $v and length $v) {
-          $v=Treex::PML::IO::make_relative_URI($ctxt->{'_schema-url'},$ctxt->{'_filename'});
+          $v=Treex::PML::IO::make_relative_URI($ctxt->{'_schema-url'},$filename);
           $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
           print $out qq(_^__^_<schema href="$v" />\n);
         } else {
@@ -599,7 +605,7 @@ sub compile_schema {
 	  } else {
 	    $href = $references->{$id};
 	  }
-	  $href=Treex::PML::IO::make_relative_URI($href,$ctxt->{_filename});
+	  $href=Treex::PML::IO::make_relative_URI($href,$filename);
           my $name = $names{$id};
           for ($id,$href, (defined $name ? $name : ())) { s/&/&amp;/g;  s/</&lt;/g;  s/"/&quot;/g; }
 	  print $out qq(_^__^__^_<reffile id="${id}").(defined $name ? qq( name="${name}") : ()).qq( href="${href}" />\n);

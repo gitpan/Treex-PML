@@ -240,7 +240,7 @@ sub load {
   my $root_ns = $reader->namespaceURI || '';
   if ($root_ns ne PML_NS
 	or grep { (($_->{ns}||'') eq PML_NS and ($_->{root}||'') eq $root_element) } @transform_map) {
-    if ($config and $config->get_root and eval { require XML::LibXSLT; 1 }) {
+      if ($config and $config->get_root) {
       # TRANSFORM
       $reader->preserveNode;
       $reader->finish;
@@ -257,23 +257,27 @@ sub load {
 	    and (!$transform->{root} or $transform->{root} eq $root_element)
 	    and !$test or eval { $dom->find($test) }) {
 	  if ($type eq 'xslt') {
-	    my $in_xsl_href = URI->new(Encode::encode_utf8($in_xsl->get_member('href')));
-	    next unless $in_xsl_href;
-	    _debug("Transforming to PML with XSLT '$in_xsl_href'");
-	    $ctxt->{'_transform_id'} = $id;
-	    my $params = $in_xsl->content;
-	    my %params;
-	    %params = map { $_->{'name'} => $_->value } $params->values if $params;
-	    $in_xsl_href = Treex::PML::ResolvePath($config->{'_filename'}, $in_xsl_href, 1);
-	    my $xslt = XML::LibXSLT->new;
-	    my $in_xsl_parsed = $xslt->parse_stylesheet_file($in_xsl_href)
-	      || die("Cannot locate XSL stylesheet '$in_xsl_href' for transformation $id\n");
-	    $dom = $in_xsl_parsed->transform($dom,%params);
-	    $dom->setBaseURI($ctxt->{'_filename'}) if $dom and $dom->can('setBaseURI');
-	    $dom->setURI($ctxt->{'_filename'}) if $dom and $dom->can('setURI');
-	    $reader = XML::LibXML::Reader->new(DOM => $dom);
-	    $reader->nextElement();
-	    last;
+            if (eval { require XML::LibXSLT; 1 }) {
+	      my $in_xsl_href = URI->new(Encode::encode_utf8($in_xsl->get_member('href')));
+	      next unless $in_xsl_href;
+	      _debug("Transforming to PML with XSLT '$in_xsl_href'");
+	      $ctxt->{'_transform_id'} = $id;
+	      my $params = $in_xsl->content;
+	      my %params;
+	      %params = map { $_->{'name'} => $_->value } $params->values if $params;
+	      $in_xsl_href = Treex::PML::ResolvePath($config->{'_filename'}, $in_xsl_href, 1);
+	      my $xslt = XML::LibXSLT->new;
+	      my $in_xsl_parsed = $xslt->parse_stylesheet_file($in_xsl_href)
+	        || die("Cannot locate XSL stylesheet '$in_xsl_href' for transformation $id\n");
+	      $dom = $in_xsl_parsed->transform($dom,%params);
+	      $dom->setBaseURI($ctxt->{'_filename'}) if $dom and $dom->can('setBaseURI');
+	      $dom->setURI($ctxt->{'_filename'}) if $dom and $dom->can('setURI');
+	      $reader = XML::LibXML::Reader->new(DOM => $dom);
+	      $reader->nextElement();
+	      last;
+            } else {
+              warn "Cannot use XML::LibXSLT for transformation!\n";
+            }
 	  } elsif ($type eq 'perl') {
 	    my $code = $in_xsl->get_member('command');
 	    next unless $code;
@@ -696,7 +700,7 @@ sub _fix_id_member {
 	  warn "Trying to knit object of type '".$decl->get_decl_path."' which has an #ID-attribute ".
 	    "'".$idM->get_name."' declared as <cdata format=\"ID\"/>. ".
 	      "Note that the data-type for #ID-attributes in objects knitted as DOM should be ".
-		"<cdata format=\"PML\"/> (Hint: redeclare with <derive> for imported types).";
+		"<cdata format=\"PMLREF\"/> (Hint: redeclare with <derive> for imported types).";
       }
     }
   }
