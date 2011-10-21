@@ -16,7 +16,7 @@ package Treex::PML;
 use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION $API_VERSION %COMPATIBLE_API_VERSION
             $FSError $Debug $resourcePath $resourcePathSplit @BACKENDS);
 BEGIN {
-$VERSION = "2.07";        # change when new functions are added etc
+$VERSION = "2.08";        # change when new functions are added etc
 }
 
 
@@ -213,7 +213,7 @@ sub _is_absolute {
 
 sub FindDirInResources {
   my ($filename)=@_;
-  unless (_is_absolute($filename) and _is_updir($filename)) {
+  unless (_is_absolute($filename) or _is_updir($filename)) {
     for my $dir (ResourcePaths()) {
       my $f = File::Spec->catfile($dir,$filename);
       return $f if -d $f;

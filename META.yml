@@ -16,163 +16,163 @@ name: Treex-PML
 provides:
   Treex::PML:
     file: lib/Treex/PML.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Alt:
     file: lib/Treex/PML/Alt.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Attribute:
     file: lib/Treex/PML/Node.pm
   Treex::PML::Backend::CSTS:
     file: lib/Treex/PML/Backend/CSTS.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::CSTS::Csts2fs:
     file: lib/Treex/PML/Backend/CSTS/Csts2fs.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::CSTS::Fs2csts:
     file: lib/Treex/PML/Backend/CSTS/Fs2csts.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::FS:
     file: lib/Treex/PML/Backend/FS.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::NTRED:
     file: lib/Treex/PML/Backend/NTRED.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::PML:
     file: lib/Treex/PML/Backend/PML.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::PMLTransform:
     file: lib/Treex/PML/Backend/PMLTransform.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::Storable:
     file: lib/Treex/PML/Backend/Storable.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::Storable::CopmpatType:
     file: lib/Treex/PML/Backend/Storable.pm
   Treex::PML::Backend::TEIXML:
     file: lib/Treex/PML/Backend/TEIXML.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::TEIXML::SAXHandler:
     file: lib/Treex/PML/Backend/TEIXML.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::TrXML:
     file: lib/Treex/PML/Backend/TrXML.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Backend::TrXML::SAXHandler:
     file: lib/Treex/PML/Backend/TrXML.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Container:
     file: lib/Treex/PML/Container.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Document:
     file: lib/Treex/PML/Document.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::FSFormat:
     file: lib/Treex/PML/FSFormat.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Factory:
     file: lib/Treex/PML/Factory.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::IO:
     file: lib/Treex/PML/IO.pm
   Treex::PML::IO::UserAgent:
     file: lib/Treex/PML/IO.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Instance:
     file: lib/Treex/PML/Instance.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Instance::Common:
     file: lib/Treex/PML/Instance/Common.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Instance::Reader:
     file: lib/Treex/PML/Instance/Reader.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Instance::Writer:
     file: lib/Treex/PML/Instance/Writer.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::List:
     file: lib/Treex/PML/List.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Node:
     file: lib/Treex/PML/Node.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema:
     file: lib/Treex/PML/Schema.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Alt:
     file: lib/Treex/PML/Schema/Alt.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Attribute:
     file: lib/Treex/PML/Schema/Attribute.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::CDATA:
     file: lib/Treex/PML/Schema/CDATA.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Choice:
     file: lib/Treex/PML/Schema/Choice.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Constant:
     file: lib/Treex/PML/Schema/Constant.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Constants:
     file: lib/Treex/PML/Schema/Constants.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Container:
     file: lib/Treex/PML/Schema/Container.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Copy:
     file: lib/Treex/PML/Schema/Copy.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Decl:
     file: lib/Treex/PML/Schema/Decl.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Derive:
     file: lib/Treex/PML/Schema/Derive.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Element:
     file: lib/Treex/PML/Schema/Element.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Import:
     file: lib/Treex/PML/Schema/Import.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::List:
     file: lib/Treex/PML/Schema/List.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Member:
     file: lib/Treex/PML/Schema/Member.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Reader:
     file: lib/Treex/PML/Schema/Reader.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Root:
     file: lib/Treex/PML/Schema/Root.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Seq:
     file: lib/Treex/PML/Schema/Seq.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Struct:
     file: lib/Treex/PML/Schema/Struct.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Template:
     file: lib/Treex/PML/Schema/Template.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::Type:
     file: lib/Treex/PML/Schema/Type.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Schema::XMLNode:
     file: lib/Treex/PML/Schema/XMLNode.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Seq:
     file: lib/Treex/PML/Seq.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Seq::Element:
     file: lib/Treex/PML/Seq/Element.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::StandardFactory:
     file: lib/Treex/PML/StandardFactory.pm
-    version: 2.07
+    version: 2.08
   Treex::PML::Struct:
     file: lib/Treex/PML/Struct.pm
-    version: 2.07
+    version: 2.08
 recommends:
   XML::CompactTree::XS: 0.02
   XML::LibXSLT: 1.69
@@ -188,4 +188,4 @@ requires:
   perl: v5.8.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 2.07
+version: 2.08
