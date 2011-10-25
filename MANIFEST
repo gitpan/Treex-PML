@@ -52,9 +52,7 @@ lib/Treex/PML/Seq/Element.pm
 lib/Treex/PML/share/pmlbackend_conf_schema.xml
 lib/Treex/PML/StandardFactory.pm
 lib/Treex/PML/Struct.pm
-Makefile.PL
 MANIFEST
-META.yml
 README
 t/00-load.t
 t/01-pml.t
@@ -105,3 +103,5 @@ test_data/pml/example9_schema.xml
 test_data/pml/templates1_schema.xml
 test_data/pml/templates1_schema_simple.xml
 test_data/pml/templates2_schema.xml
+Makefile.PL
+META.yml

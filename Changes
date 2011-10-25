@@ -1,5 +1,8 @@
 Revision history for Treex-PML
 
+2.09    Tue Oct 25 11:02:29 CEST 2011
+        bugfix: quote ']]>'
+
 2.06    Tue Mar 8 15:50:38 2011
         bugfix: correctly test $@ when trying backends
 

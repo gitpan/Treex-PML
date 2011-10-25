@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use UNIVERSAL::DOES;
 
 BEGIN {
-  our $VERSION = '2.08'; # version template
+  our $VERSION = '2.09'; # version template
 }
 use List::Util qw(first);
 use Treex::PML::Instance::Common qw(:diagnostics :constants);
@@ -1079,7 +1079,7 @@ sub compile_schema {
          my ($tag,$data)=@_;
          print $out (length($tag) ? `._indent().q`"<$tag>" : '>') if defined $tag;
          if (defined $data and length $data) {
-           $data=~s/&/&amp;/g;$data=~s/</&lt;/g;
+           $data=~s/&/&amp;/g;$data=~s/</&lt;/g;$data=~s/\]\]>/]]&gt;/g;
            print $out $data;
          }
          print $out "</$tag>" if defined $tag and length $tag;
