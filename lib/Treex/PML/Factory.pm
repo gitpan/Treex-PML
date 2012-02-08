@@ -6,7 +6,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.09'; # version template
+  $VERSION='2.10'; # version template
 }
 use Carp;
 use UNIVERSAL::DOES;

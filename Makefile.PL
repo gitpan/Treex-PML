@@ -9,6 +9,7 @@ WriteMakefile
                    'File::ShareDir' => '1.00',
                    'File::Which' => 0,
                    'IO::Zlib' => 0,
+                   'LWP::UserAgent' => 0,
                    'Module::Build' => '0.36',
                    'Test::More' => 0,
                    'UNIVERSAL::DOES' => '0.004',

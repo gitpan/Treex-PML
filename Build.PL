@@ -40,6 +40,7 @@ my $builder = $class->new(
       'perl' => '5.8.0',
       'URI' => '1.35',
       'File::Which' => 0,
+      'LWP::UserAgent' => 0,
       'IO::Zlib' => 0,
       'UNIVERSAL::DOES' => '0.004',
       'XML::CompactTree' => '0.03',
