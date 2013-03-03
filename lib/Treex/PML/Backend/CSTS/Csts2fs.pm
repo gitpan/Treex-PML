@@ -2,7 +2,7 @@ package Treex::PML::Backend::CSTS::Csts2fs;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.04'; # version template
+  $VERSION='2.12'; # version template
 }
 use Treex::PML;
 

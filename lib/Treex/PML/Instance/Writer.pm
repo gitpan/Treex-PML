@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use UNIVERSAL::DOES;
 
 BEGIN {
-  our $VERSION = '2.04'; # version template
+  our $VERSION = '2.12'; # version template
 }
 use List::Util qw(first);
 use Treex::PML::Instance::Common qw(:diagnostics :constants);
