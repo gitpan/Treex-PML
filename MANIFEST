@@ -59,6 +59,7 @@ t/01-pml.t
 t/02-csts.t
 t/03-fs.t
 t/04-xslt.t
+t/url.t
 t/boilerplate.t
 t/manifest.t
 t/pod-coverage.t
@@ -103,5 +104,10 @@ test_data/pml/example9_schema.xml
 test_data/pml/templates1_schema.xml
 test_data/pml/templates1_schema_simple.xml
 test_data/pml/templates2_schema.xml
+test_data/url/mdata_schema.xml
+test_data/url/sample0.m.gz
+test_data/url/sample0.w.gz
+test_data/url/wdata_schema.xml
 Makefile.PL
 META.yml
+META.json

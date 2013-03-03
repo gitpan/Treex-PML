@@ -68,14 +68,14 @@ our %EXPORT_TAGS = (
   'diagnostics' => $Treex::PML::Instance::Common::EXPORT_TAGS{diagnostics},
 );
 $EXPORT_TAGS{'all'} = [ @{ $EXPORT_TAGS{'constants'} },
-			@{ $EXPORT_TAGS{'diagnostics'} },
-			@{ $EXPORT_TAGS{'functions'} },
-			qw( $DEBUG )
-		      ];
+                        @{ $EXPORT_TAGS{'diagnostics'} },
+                        @{ $EXPORT_TAGS{'functions'} },
+                        qw( $DEBUG )
+                      ];
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(  );
-our $VERSION = '2.10'; # version template
+our $VERSION = '2.04'; # version template
 
 BEGIN {
 require Treex::PML::IO;
@@ -126,7 +126,7 @@ use Treex::PML::Instance::Reader;
 use Treex::PML::Instance::Writer;
 
 # PML Instance File
-sub get_filename	    {
+sub get_filename {
   my $filename= $_[0]->{'_filename'};
   if (blessed($filename) and $filename->isa('URI')
       and $filename->scheme eq 'file') {
@@ -145,46 +145,46 @@ sub get_url {
 sub set_filename {
   $_[0]->{'_filename'} = Treex::PML::IO::make_abs_URI($_[1]); # 1K faster than cwd
 }
-sub get_transform_id	    {  $_[0]->{'_transform_id'}; }
-sub set_transform_id	    {  $_[0]->{'_transform_id'} = $_[1]; }
+sub get_transform_id  {  $_[0]->{'_transform_id'}; }
+sub set_transform_id  {  $_[0]->{'_transform_id'} = $_[1]; }
 
 # Schema
-sub schema		    {  $_[0]->{'_schema'} }
+sub schema            {  $_[0]->{'_schema'} }
 *get_schema = \&schema;
-sub set_schema		    {  $_[0]->{'_schema'} = $_[1] }
-sub get_schema_url	    {  $_[0]->{'_schema-url'} }
-sub set_schema_url	    {  $_[0]->{'_schema-url'} = $_[1]; }
+sub set_schema        {  $_[0]->{'_schema'} = $_[1] }
+sub get_schema_url    {  $_[0]->{'_schema-url'} }
+sub set_schema_url    {  $_[0]->{'_schema-url'} = $_[1]; }
 
 # Data
-sub get_root		    {  $_[0]->{'_root'}; }
-sub set_root		    {  $_[0]->{'_root'} = $_[1]; }
-sub get_trees		    {  $_[0]->{'_trees'}; }
-#sub set_trees		    {  $_[0]->{'_trees'} = $_[1]; }
-sub get_trees_prolog	    {  $_[0]->{'_pml_prolog'}; }
-#sub set_trees_prolog	    {  $_[0]->{'_pml_prolog'} = $_[1]; }
-sub get_trees_epilog	    {  $_[0]->{'_pml_epilog'}; }
-#sub set_trees_epilog	    {  $_[0]->{'_pml_epilog'} = $_[1]; }
-sub get_trees_type	    {  $_[0]->{'_pml_trees_type'}; }
-#sub set_trees_type	    {  $_[0]->{'_pml_trees_type'} = $_[1]; }
+sub get_root          {  $_[0]->{'_root'}; }
+sub set_root          {  $_[0]->{'_root'} = $_[1]; }
+sub get_trees         {  $_[0]->{'_trees'}; }
+#sub set_trees        {  $_[0]->{'_trees'} = $_[1]; }
+sub get_trees_prolog  {  $_[0]->{'_pml_prolog'}; }
+#sub set_trees_prolog {  $_[0]->{'_pml_prolog'} = $_[1]; }
+sub get_trees_epilog  {  $_[0]->{'_pml_epilog'}; }
+#sub set_trees_epilog {  $_[0]->{'_pml_epilog'} = $_[1]; }
+sub get_trees_type    {  $_[0]->{'_pml_trees_type'}; }
+#sub set_trees_type   {  $_[0]->{'_pml_trees_type'} = $_[1]; }
 
 # References
-sub get_references_hash	    {
+sub get_references_hash {
   return ($_[0]->{'_references'}||={});
 }
-sub set_references_hash	    {  $_[0]->{'_references'} = $_[1]; }
-sub get_ref_ids_by_name	    {
+sub set_references_hash {  $_[0]->{'_references'} = $_[1]; }
+sub get_ref_ids_by_name {
   my ($self,$name)=@_;
   my $refs = $self->get_refname_hash->{$name};
   return ref($refs) ? @$refs : ($refs);
 }
-sub get_refs_by_name	    {
+sub get_refs_by_name {
   my ($self,$name)=@_;
   return map {$self->get_ref($_)} $self->get_ref_ids_by_name;
 }
-sub get_refname_hash	    {
+sub get_refname_hash {
   return ($_[0]->{'_refnames'}||={});
 }
-sub set_refname_hash	    {  $_[0]->{'_refnames'} = $_[1]; }
+sub set_refname_hash {  $_[0]->{'_refnames'} = $_[1]; }
 sub get_ref {
   my ($self,$id)=@_;
   my $refs = $self->{'_ref'};
@@ -198,8 +198,8 @@ sub set_ref {
 }
 
 # Status=1 (if parsed fine)
-sub get_status		    {  $_[0]->{'_status'}; }
-#sub set_status		    {  $_[0]->{'_status'} = $_[1]; }
+sub get_status  {  $_[0]->{'_status'}; }
+#sub set_status {  $_[0]->{'_status'} = $_[1]; }
 
 sub get_reffiles {
   my ($ctxt)=@_;
@@ -209,22 +209,22 @@ sub get_reffiles {
     foreach my $reference (@$references) {
       my $refids = $ctxt->{'_refnames'}->{$reference->{name}};
       if ($refids) {
-	foreach my $refid (ref($refids) ? @$refids : ($refids)) {
-	  my $href = $ctxt->{'_references'}->{$refid};
-	  if ($href) {
-	    _debug("Found '$reference->{name}' as $refid# = '$href'");
-	    push @refs,{
-	      readas => $reference->{readas},
-	      name => $reference->{name},
-	      id => $refid,
-	      href => $href
-	     };
-	  } else {
-	    _die("No href for $refid# ($reference->{name})")
-	  }
-	}
+        foreach my $refid (ref($refids) ? @$refids : ($refids)) {
+          my $href = $ctxt->{'_references'}->{$refid};
+          if ($href) {
+            _debug("Found '$reference->{name}' as $refid# = '$href'");
+            push @refs,{
+              readas => $reference->{readas},
+              name => $reference->{name},
+              id => $refid,
+              href => $href
+             };
+          } else {
+            _die("No href for $refid# ($reference->{name})")
+          }
+        }
       } else {
-	_warn("Didn't find any reference to '".$reference->{name}."'\n");
+        _warn("Didn't find any reference to '".$reference->{name}."'\n");
       }
     }
   }
@@ -240,14 +240,14 @@ sub read_reffiles {
     my $readas = $ref->{readas};
     if (defined $readas) {
       if ($readas eq 'dom') {
-	$ctxt->readas_dom($id,$ref->{href},$opts);
+        $ctxt->readas_dom($id,$ref->{href},$opts);
       } elsif($readas eq 'trees') {
-	#  when translating to Treex::PML::Document, 
+        #  when translating to Treex::PML::Document, 
       #  push to fs-require [$id,$ref->{href}];
       } elsif($readas eq 'pml') {
-	$ctxt->readas_pml($id,$ref->{href},$opts);
+        $ctxt->readas_pml($id,$ref->{href},$opts);
       } elsif (length($readas)) {
-	_warn("Ignoring references with unknown readas method: '$readas' for reffile id='$id', href='$ref->{href}'\n");
+        _warn("Ignoring references with unknown readas method: '$readas' for reffile id='$id', href='$ref->{href}'\n");
       }
     }
   }
@@ -414,36 +414,36 @@ sub get_data {
     my $is_list = UNIVERSAL::DOES::does($val,'Treex::PML::List');
     if ($is_list or UNIVERSAL::DOES::does($val,'Treex::PML::Alt')) {
       if ($step =~ /^\[([-+]?\d+)\]/) {
-	$val =
-	  $1>0 ? $val->[$1-1] :
-	  $1<0 ? $val->[$1] : undef;
+        $val =
+          $1>0 ? $val->[$1-1] :
+          $1<0 ? $val->[$1] : undef;
       } elsif ($strict) {
-#	warn "Can't follow attribute path '$path' (step '$step')\n";
-	return; # ERROR
+#        warn "Can't follow attribute path '$path' (step '$step')\n";
+        return; # ERROR
       } else {
-	$val = $val->[0];
-	redo unless $step eq ($is_list ? LM : AM);
+        $val = $val->[0];
+        redo unless $step eq ($is_list ? LM : AM);
       }
     } elsif (UNIVERSAL::DOES::does($val,'Treex::PML::Seq')) {
       if ($step =~ /^\[([-+]?\d+)\](.*)/) {
-	$val =
-	  $1>0 ? $val->elements_list->[$1-1] :
-	  $1<0 ? $val->elements_list->[$1] : undef; # element
-	if ($val) {
-	  if (defined $2 and length $2) { # optional name test
-	    return if $val->[0] ne $2; # ERROR
-	  }
-	  $val = $val->[1]; # value
-	}
+        $val =
+          $1>0 ? $val->elements_list->[$1-1] :
+          $1<0 ? $val->elements_list->[$1] : undef; # element
+        if ($val) {
+          if (defined $2 and length $2) { # optional name test
+            return if $val->[0] ne $2; # ERROR
+          }
+          $val = $val->[1]; # value
+        }
       } elsif ($step =~ /^([^\[]+)(?:\[([-+]?\d+)\])?/) {
-	my $i = $2;
-	$val = $val->values($1);
-	if ($i ne q{}) {
-	  $val = $i>0 ? $val->[$i-1] :
-	         $i<0 ? $val->[$i] : undef;
-	}
+        my $i = $2;
+        $val = $val->values($1);
+        if ($i ne q{}) {
+          $val = $i>0 ? $val->[$i-1] :
+                 $i<0 ? $val->[$i] : undef;
+        }
       } else {
-	return; # ERROR
+        return; # ERROR
       }
     } elsif (ref($val)) {
       $val = $val->{$step};
@@ -474,38 +474,38 @@ sub get_all {
       $val=$_;
       my $is_list = UNIVERSAL::DOES::does($val,'Treex::PML::List');
       if ($is_list or UNIVERSAL::DOES::does($val,'Treex::PML::Alt')) {
-	if ($step =~ /^\[([-+]?\d+)\]/) {
-	  $1>0 ? $val->[$1-1] :
-	    $1<0 ? $val->[$1] : ();
-	} else {
-	  $redo=1 unless $step eq ($is_list ? 'LM' : 'AM');
-	  @$val
-	}
+        if ($step =~ /^\[([-+]?\d+)\]/) {
+          $1>0 ? $val->[$1-1] :
+            $1<0 ? $val->[$1] : ();
+        } else {
+          $redo=1 unless $step eq ($is_list ? 'LM' : 'AM');
+          @$val
+        }
       } elsif (UNIVERSAL::DOES::does($val,'Treex::PML::Seq')) {
-	#	grep { $_->[0] eq $step } @{$val->[0]}
-	if ($step =~ /^\[([-+]?\d+)\](.*)/) {
-	  $val =
-	    $1>0 ? $val->elements_list->[$1-1] :
-	    $1<0 ? $val->elements_list->[$1] : undef; # element
-	  $val ?
-	    (defined $2 and length $2) ?
-	      ($val->[0] eq $2) ? ($val->[1]) : ()
-	    : $val->[1]
-	  :()
-	} elsif ($step =~ /^([^\[]+)(?:\[([-+]?\d+)\])?/) {
-	  my $i = $2;
-	  $val = $val->values($1);
-	  if (defined $i and length $i) {
-	     $i>0 ? $val->[$i-1] :
-	     $i<0 ? $val->[$i] : ();
-	  } else {
-	    @$val
-	  }
-	} else { () }
+        #        grep { $_->[0] eq $step } @{$val->[0]}
+        if ($step =~ /^\[([-+]?\d+)\](.*)/) {
+          $val =
+            $1>0 ? $val->elements_list->[$1-1] :
+            $1<0 ? $val->elements_list->[$1] : undef; # element
+          $val ?
+            (defined $2 and length $2) ?
+              ($val->[0] eq $2) ? ($val->[1]) : ()
+            : $val->[1]
+          :()
+        } elsif ($step =~ /^([^\[]+)(?:\[([-+]?\d+)\])?/) {
+          my $i = $2;
+          $val = $val->values($1);
+          if (defined $i and length $i) {
+             $i>0 ? $val->[$i-1] :
+             $i<0 ? $val->[$i] : ();
+          } else {
+            @$val
+          }
+        } else { () }
       } elsif (ref($val)) {
-	($val->{$step});
+        ($val->{$step});
       } else {
-	()
+        ()
       }
     } @vals;
     redo if $redo;
@@ -528,91 +528,91 @@ sub set_data {
     my $step = shift @steps;
     if (UNIVERSAL::DOES::does($val,'Treex::PML::List') or UNIVERSAL::DOES::does($val,'Treex::PML::Alt')) {
       if ($step =~ /^\[([-+]?\d+)\]/) {
-	if (@steps) {
-	  $val =
-	    $1>0 ? $val->[$1-1] :
-	    $1<0 ? $val->[$1] : undef;
-	} else {
-	  return
-	    $1>0 ? ($val->[$1-1]=$value) :
-	    $1<0 ? ($val->[$1]=$value) : undef;
-	}
+        if (@steps) {
+          $val =
+            $1>0 ? $val->[$1-1] :
+            $1<0 ? $val->[$1] : undef;
+        } else {
+          return
+            $1>0 ? ($val->[$1-1]=$value) :
+            $1<0 ? ($val->[$1]=$value) : undef;
+        }
       } elsif ($strict) {
-	my $msg = "Can't follow attribute path '$path' (step '$step')";
-	croak $msg if ($strict==2);
-	warn $msg."\n";
-	return; # ERROR
+        my $msg = "Can't follow attribute path '$path' (step '$step')";
+        croak $msg if ($strict==2);
+        warn $msg."\n";
+        return; # ERROR
       } else {
-	if (@steps) {
-	  $val = $val->[0]{$step};
-	} else {
-	  $val->[0]{$step} = $value;
-	  return $value;
-	}
+        if (@steps) {
+          $val = $val->[0]{$step};
+        } else {
+          $val->[0]{$step} = $value;
+          return $value;
+        }
       }
     } elsif (UNIVERSAL::DOES::does($val,'Treex::PML::Seq')) {
       if ($step =~ /^\[([-+]?\d+)\](.*)/) {
-	my $i = $1;
-	my $el = $i>0 ? $val->elements_list->[$i-1] :
-	         $i<0 ? $val->elements_list->[$i] : undef; # element
-	if (defined $el and defined $2 and length $2 and $el->[0] ne $2) { # optional name test
-	  my $msg = "Can't follow attribute path '$path' (step '$step')";
-	  croak $msg if ($strict==2);
-	  warn $msg."\n";
-	  return; # ERROR
-	}
-	if (@steps) {
-	  $val = $el->[1];
-	} else {
-	  if (UNIVERSAL::DOES::does($value,'Treex::PML::Seq::Element')) {
-	    $val = $val->elements_list;
-	    return
-	      $i>0 ? ($val->[$i-1]=$value) :
-	      $i<0 ? ($val->[$i]=$value) : undef;
-	  } elsif (ref $val->[$i-1]) {
-	    $el->[1]=$value;
-	    return $value;
-	  } else {
-	    my $msg = "Can't follow attribute path '$path' (no sequence element found at step '$step')";
-	    croak $msg if ($strict==2);
-	    warn $msg."\n";
-	    return; # ERROR
-	  }
-	}
+        my $i = $1;
+        my $el = $i>0 ? $val->elements_list->[$i-1] :
+                 $i<0 ? $val->elements_list->[$i] : undef; # element
+        if (defined $el and defined $2 and length $2 and $el->[0] ne $2) { # optional name test
+          my $msg = "Can't follow attribute path '$path' (step '$step')";
+          croak $msg if ($strict==2);
+          warn $msg."\n";
+          return; # ERROR
+        }
+        if (@steps) {
+          $val = $el->[1];
+        } else {
+          if (UNIVERSAL::DOES::does($value,'Treex::PML::Seq::Element')) {
+            $val = $val->elements_list;
+            return
+              $i>0 ? ($val->[$i-1]=$value) :
+              $i<0 ? ($val->[$i]=$value) : undef;
+          } elsif (ref $val->[$i-1]) {
+            $el->[1]=$value;
+            return $value;
+          } else {
+            my $msg = "Can't follow attribute path '$path' (no sequence element found at step '$step')";
+            croak $msg if ($strict==2);
+            warn $msg."\n";
+            return; # ERROR
+          }
+        }
       } elsif ($step =~ /^([^\[]+)(?:\[([-+]?\d+)\])?/) {
-	my $i = $2;
-	$val = $val->values($1);
-	unless (@steps) {
-	  $val = $1>0 ? $val->[$1-1] :
-	         $1<0 ? $val->[$1] : undef;
-	  if (defined $val) {
-	    if (UNIVERSAL::DOES::does($value,'Treex::PML::Seq::Element')) {
-	      $val->[0]=$value->[0];
-	      $val->[1]=$value->[1];
-	      return $val;
-	    } else {
-	      $val->[1]=$value;
-	      return $value;
-	    }
-	  } else {
-	    my $msg = "Can't follow attribute path '$path' (no sequence element found at step '$step')";
-	    croak $msg if ($strict==2);
-	    warn $msg."\n";
-	    return; # ERROR
-	  }
-	}
+        my $i = $2;
+        $val = $val->values($1);
+        unless (@steps) {
+          $val = $1>0 ? $val->[$1-1] :
+                 $1<0 ? $val->[$1] : undef;
+          if (defined $val) {
+            if (UNIVERSAL::DOES::does($value,'Treex::PML::Seq::Element')) {
+              $val->[0]=$value->[0];
+              $val->[1]=$value->[1];
+              return $val;
+            } else {
+              $val->[1]=$value;
+              return $value;
+            }
+          } else {
+            my $msg = "Can't follow attribute path '$path' (no sequence element found at step '$step')";
+            croak $msg if ($strict==2);
+            warn $msg."\n";
+            return; # ERROR
+          }
+        }
       } else {
-	return; # ERROR
+        return; # ERROR
       }
     } elsif (ref($val)) {
       if (@steps) {
-	if (!defined($val->{$step}) and $steps[0]!~/^\[/) {
-	  $val->{$step}=Treex::PML::Factory->createStructure();
-	}
-	$val = $val->{$step};
+        if (!defined($val->{$step}) and $steps[0]!~/^\[/) {
+          $val->{$step}=Treex::PML::Factory->createStructure();
+        }
+        $val = $val->{$step};
       } else {
-	$val->{$step} = $value;
-	return $value;
+        $val->{$step} = $value;
+        return $value;
       }
     } elsif (defined($val)) {
       my $msg = "Can't follow attribute path '$path' (step '$step')";
@@ -642,9 +642,9 @@ sub __match_path {
       push @r,[\@rest=>$m->[1]];
     } elsif ($m_step !~ /^\[/) {
       if (!length($s)) {
-	push @r,$m;
+        push @r,$m;
       } elsif ($s eq $m_step) {
-	push @r,[\@rest=>$m->[1]];
+        push @r,[\@rest=>$m->[1]];
       }
     }
   }
@@ -665,7 +665,7 @@ sub for_each_match {
     @match_paths = map { [ __split_path($_) => $paths->{$_} ] } keys %$paths;
   } else {
     croak("Usage: \$pml->for_each_match( { path1 => callback1, path2 => callback2,...} )\n".
-	  "   or: Treex::PML::Instance::for_each_match( \$obj, { path1 => callback1, ... } )\n");
+          "   or: Treex::PML::Instance::for_each_match( \$obj, { path1 => callback1, ... } )\n");
   }
   my $type;
   if (UNIVERSAL::DOES::does($obj,'Treex::PML::Instance')) {
@@ -689,8 +689,8 @@ sub __for_each_match_dispatch {
   if (defined $type) {
     my $dt = $type->get_decl_type;
     if ($dt==PML_ATTRIBUTE_DECL ||
-	$dt==PML_MEMBER_DECL    ||
-	$dt==PML_ELEMENT_DECL) {
+        $dt==PML_MEMBER_DECL    ||
+        $dt==PML_ELEMENT_DECL) {
       $type = $type->get_content_decl;
     }
   }
@@ -701,7 +701,7 @@ sub __for_each_match_dispatch {
       my $cb = $m->[1];
       my @args;
       if (UNIVERSAL::isa($cb,'ARRAY')) {
-	($cb,@args) = @$cb;
+        ($cb,@args) = @$cb;
       }
       $cb->({path => $path,  value => $v, type=>$type},@args);
     }
@@ -718,38 +718,38 @@ sub __for_each_match {
       $dt=$type->get_decl_type;
     }
     if ((UNIVERSAL::DOES::does($val, 'Treex::PML::List') or UNIVERSAL::DOES::does($val, 'Treex::PML::Alt'))
-	and (!defined($dt) ||
-	       $dt == PML_LIST_DECL ||
-	       $dt == PML_ALT_DECL)) {
+        and (!defined($dt) ||
+               $dt == PML_LIST_DECL ||
+               $dt == PML_ALT_DECL)) {
       my $no = 1;
       my $content_type =(defined($type)||undef) && $type->get_content_decl;
       foreach my $v (@$val) {
-	__for_each_match_dispatch($p,"[$no]",$match_paths,
-				  $v,$content_type);
-	$no++;
+        __for_each_match_dispatch($p,"[$no]",$match_paths,
+                                  $v,$content_type);
+        $no++;
       }
     } elsif ((UNIVERSAL::DOES::does($val, 'Treex::PML::Seq'))
-	       and (!defined($dt) || $dt == PML_SEQUENCE_DECL)) {
+               and (!defined($dt) || $dt == PML_SEQUENCE_DECL)) {
       my $no = 1;
       foreach my $e ($val->elements) {
-	my $name = $e->name;
-	my $content_type = (defined($type)||undef) && $type->get_element_by_name($name);
-	if (!defined($type) || defined($content_type)) {
-	  __for_each_match_dispatch($p,"[$no]$name",$match_paths,
-				    $e->value, $content_type);
-	}
-	$no++;
+        my $name = $e->name;
+        my $content_type = (defined($type)||undef) && $type->get_element_by_name($name);
+        if (!defined($type) || defined($content_type)) {
+          __for_each_match_dispatch($p,"[$no]$name",$match_paths,
+                                    $e->value, $content_type);
+        }
+        $no++;
       }
     } elsif (UNIVERSAL::isa($val,'HASH')
-	and (!defined($dt)
-	       || $dt == PML_STRUCTURE_DECL
-	       || $dt == PML_CONTAINER_DECL)) {
+        and (!defined($dt)
+               || $dt == PML_STRUCTURE_DECL
+               || $dt == PML_CONTAINER_DECL)) {
       foreach my $name (keys %$val) {
-	my $content_type = (defined($type)||undef) && $type->get_member_by_name($name);
-	if (!defined($type) || defined($content_type)) {
-	  __for_each_match_dispatch($p,$name,$match_paths,$val->{$name},
-				    $content_type);
-	}
+        my $content_type = (defined($type)||undef) && $type->get_member_by_name($name);
+        if (!defined($type) || defined($content_type)) {
+          __for_each_match_dispatch($p,$name,$match_paths,$val->{$name},
+                                    $content_type);
+        }
       }
     }
   }
@@ -805,14 +805,14 @@ sub _traverse_data {
     my @members = $decl->get_members;
     if ($opts->{no_childnodes}) {
       @members = grep {
-	my $role = $_->get_role;
-	!defined($role) or $role ne '#CHILDNODES'
+        my $role = $_->get_role;
+        !defined($role) or $role ne '#CHILDNODES'
       } $decl->get_members;
     }
     if ($opts->{no_trees}) {
       @members = grep {
-	my $role = $_->get_role;
-	!defined($role) or $role ne '#TREES'
+        my $role = $_->get_role;
+        !defined($role) or $role ne '#TREES'
       } $decl->get_members;
     }
     for (@members) {
@@ -885,7 +885,7 @@ sub convert_to_fsfile {
   $fsfile->changeMetaData( 'refnames',       $ctxt->{'_refnames'}        );
   $fsfile->changeMetaData( 'fs-require',
      [ map { [$_->{id},$_->{href}] } 
-	 grep { $_->{readas} eq 'trees' } $ctxt->get_reffiles() ]
+         grep { $_->{readas} eq 'trees' } $ctxt->get_reffiles() ]
   );
 
   $fsfile->changeAppData(  'ref',            $ctxt->{'_ref'} || {}         );
@@ -897,7 +897,7 @@ sub convert_to_fsfile {
   $fsfile->changeMetaData( 'pml_prolog',     $ctxt->{'_pml_prolog'}        );
   $fsfile->changeMetaData( 'pml_epilog',     $ctxt->{'_pml_epilog'}        );
   
-  if ($ctxt->{'_pi'})  {
+  if ($ctxt->{'_pi'}) {
     my @patterns = map { $_->[1] } grep { $_->[0] eq 'tred-pattern' } @{$ctxt->{'_pi'}};
     my ($hint) = map { $_->[1] } grep { $_->[0] eq 'tred-hint' } @{$ctxt->{'_pi'}} ;
     for (@patterns, $hint) {
@@ -927,11 +927,11 @@ sub convert_to_fsfile {
   @hide = grep { !$uniq{$_} && ($uniq{$_}=1) } @hide;
   if (@order>1) {
     _warn("Treex::PML::Document only supports #ORDER members/attributes with a same name: found {",
-	  join(',',@order),"}, using $order[0]!");
+          join(',',@order),"}, using $order[0]!");
   }
   if (@hide>1) {
     _warn("Treex::PML::Document only supports #HIDE members/attributes with a same name: found {",
-	  join(',',@hide),"} $hide[0]!");
+          join(',',@hide),"} $hide[0]!");
   }
   my $defs = $fsfile->FS->defs;
   $defs->{$order[0]} = ' N' if @order;
@@ -1093,32 +1093,32 @@ details).
     <?xml version="1.0" encoding="utf-8"?>
     <pmlbackend xmlns="http://ufal.mff.cuni.cz/pdt/pml/">
       <head>
-	<schema href="pmlbackend_conf_schema.xml"/>
+        <schema href="pmlbackend_conf_schema.xml"/>
       </head>
       <options>
-	<load>
-	  <validate_cdata>1</validate_cdata>
-	  <use_resources>1</use_resources>
-	</load>
-	<save>
-	  <indent>4</indent>
-	  <validate_cdata>1</validate_cdata>
-	  <write_single_LM>1</write_single_LM>
-	</save>
+        <load>
+          <validate_cdata>1</validate_cdata>
+          <use_resources>1</use_resources>
+        </load>
+        <save>
+          <indent>4</indent>
+          <validate_cdata>1</validate_cdata>
+          <write_single_LM>1</write_single_LM>
+        </save>
       </options>
       <transform_map>
-	<transform id="alpino" test="alpino_ds[@version='1.1' or @version='1.2']">
-	  <in type="xslt" href="alpino2pml.xsl"/>
-	  <out type="xslt" href="pml2alpino.xsl"/>
-	</transform>
+        <transform id="alpino" test="alpino_ds[@version='1.1' or @version='1.2']">
+          <in type="xslt" href="alpino2pml.xsl"/>
+          <out type="xslt" href="pml2alpino.xsl"/>
+        </transform>
         <transform id="sdata" root="sdata" ns="http://ufal.mff.cuni.cz/pdt/pml/">
           <in type="perl" command="require SDataMerge; return SDataMerge::transform(@_);"/>
         </transform>
         <transform id="tei" test="*[namespace-uri()='http://www.tei-c.org/ns/1.0']">
           <in type="pipe" command="tei2pml.sh">
-	    <param name="--stdin" />
-	    <param name="--stdout" />
-	  </in>
+            <param name="--stdin" />
+            <param name="--stdout" />
+          </in>
         </transform>
       </transform_map>
     </pmlbackend>
@@ -1569,7 +1569,7 @@ C<Treex::PML::Instance> with a given ID (note that this may break knitting).
 Prague Markup Language (PML) format:
 L<http://ufal.mff.cuni.cz/jazz/PML/>
 
-Tree editor TrEd: L<http://ufal.mff.cuni.cz/~pajas/tred>
+Tree editor TrEd: L<http://ufal.mff.cuni.cz/tred>
 
 Related packages: L<Treex::PML>, L<Treex::PML::Schema>, L<Treex::PML::Document>
 

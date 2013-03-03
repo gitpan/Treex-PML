@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 use UNIVERSAL::DOES;
 
 BEGIN {
-  our $VERSION = '2.10'; # version template
+  our $VERSION = '2.04'; # version template
 }
 use List::Util qw(first);
 use Treex::PML::Instance::Common qw(:diagnostics :constants);
@@ -136,26 +136,26 @@ sub save {
   unless ($fh) {
     if (defined($href) and length($href)) {
       eval {
-	rename_uri($href,$href."~") unless $href=~/^ntred:/;
+        rename_uri($href,$href."~") unless $href=~/^ntred:/;
       };
       my $ok = 0;
       my $res;
       eval {
-	$fh = open_backend($href,'w')
-	  || die "Cannot open $href for writing: $!";
-	if ($fh) {
-	  binmode $fh;
-	  $res = $ctxt->save({%$opts, fh=> $fh});
-	  close_backend($fh);
-	  $ok = 1;
-	}
+        $fh = open_backend($href,'w')
+          || die "Cannot open $href for writing: $!";
+        if ($fh) {
+          binmode $fh;
+          $res = $ctxt->save({%$opts, fh=> $fh});
+          close_backend($fh);
+          $ok = 1;
+        }
       };
       unless ($ok) {
-	my $err = $@;
-	eval {
-	  rename_uri($href."~",$href) unless $href=~/^ntred:/;
-	};
-	die($err."$@\n") if $err;
+        my $err = $@;
+        eval {
+          rename_uri($href."~",$href) unless $href=~/^ntred:/;
+        };
+        die($err."$@\n") if $err;
       }
       return $res;
     } else {
@@ -173,12 +173,12 @@ sub save {
     if ($transform) {
       ($out_xsl) = $transform->{'out'};
       if ($out_xsl->{'type'} ne 'xslt') {
-	die(__PACKAGE__.": unsupported output transformation $transform_id (only type='xslt') transformations are supported)");
+        die(__PACKAGE__.": unsupported output transformation $transform_id (only type='xslt') transformations are supported)");
       }
       $out_xsl_href = URI->new(Encode::encode_utf8($out_xsl->get_member('href')));
       $out_xsl_href = Treex::PML::ResolvePath($config->{_filename}, $out_xsl_href, 1);
       unless (defined $out_xsl_href and length $out_xsl_href) {
-	die(__PACKAGE__.": no output transformation defined for $transform_id");
+        die(__PACKAGE__.": no output transformation defined for $transform_id");
       }
       $orig_fh = $fh;
       open(my $pml_fh, '>', \$xsl_source) or die "Cannot open scalar for writing!";
@@ -197,7 +197,7 @@ sub save {
     @refs_to_save = grep { exists $refs_to_save->{$_->{id}} } @refs_to_save;
     for (@refs_to_save) {
       unless (defined $refs_to_save->{$_->{id}}) {
-	$refs_to_save->{$_->{id}}=$_->{href};
+        $refs_to_save->{$_->{id}}=$_->{href};
       }
     }
   } else {
@@ -232,9 +232,9 @@ sub save {
     if ($ctxt->{'_pi'}) {
       my ($n,$v);
       for my $pi (@{$ctxt->{'_pi'}}) {
-	# ($n,$v)=@$pi;
-	# for ($n,$v) { s/&/&amp;/g; s/</&lt;/g; } # no no, _pi's are already quoted
-	print $fh qq(<?@$pi?>\n);
+        # ($n,$v)=@$pi;
+        # for ($n,$v) { s/&/&amp;/g; s/</&lt;/g; } # no no, _pi's are already quoted
+        print $fh qq(<?@$pi?>\n);
       }
     }
   };
@@ -265,51 +265,51 @@ sub save {
   if (ref($ctxt->{'_ref'})) {
     foreach my $ref (@refs_to_save) {
       if ($ref->{readas} eq 'dom') {
-	my $dom = $ctxt->{'_ref'}->{$ref->{id}};
-	my $href;
-	if (defined($refs_to_save->{$ref->{id}})) {
-	  $href = $refs_to_save->{$ref->{id}};
-	} else {
-	  $href = $ref->{href}
-	}
-	if (ref($dom)) {
-	  eval {
-	    rename_uri($href,$href."~") unless $href=~/^ntred:/;
-	  };
-	  my $ok = 0;
-	  eval {
-	    my $ref_fh = open_backend($href,"w");
-	    if ($ref_fh) {
-	      binmode $ref_fh;
-	      $dom->toFH($ref_fh,1);
-	      close_backend($ref_fh);
-	      $ok = 1;
-	    }
-	  };
-	  unless ($ok) {
-	    my $err = $@;
-	    eval {
-	      rename_uri($href."~",$href) unless $href=~/^ntred:/;
-	    };
-	    _die($err."$@") if $err;
-	  }
-	}
+        my $dom = $ctxt->{'_ref'}->{$ref->{id}};
+        my $href;
+        if (defined($refs_to_save->{$ref->{id}})) {
+          $href = $refs_to_save->{$ref->{id}};
+        } else {
+          $href = $ref->{href}
+        }
+        if (ref($dom)) {
+          eval {
+            rename_uri($href,$href."~") unless $href=~/^ntred:/;
+          };
+          my $ok = 0;
+          eval {
+            my $ref_fh = open_backend($href,"w");
+            if ($ref_fh) {
+              binmode $ref_fh;
+              $dom->toFH($ref_fh,1);
+              close_backend($ref_fh);
+              $ok = 1;
+            }
+          };
+          unless ($ok) {
+            my $err = $@;
+            eval {
+              rename_uri($href."~",$href) unless $href=~/^ntred:/;
+            };
+            _die($err."$@") if $err;
+          }
+        }
       } elsif ($ref->{readas} eq 'pml') {
-	my $ref_id = $ref->{id};
-	my $pml = $ctxt->{'_ref'}->{$ref_id};
-	if ($pml) {
-	  my $href;
-	  if (exists($refs_to_save->{$ref_id})) {
-	    $href = $refs_to_save->{$ref_id};
-	  } else {
-	    $href = $ref->{href}
-	  }
-	  $pml->save({ %$opts,
-		       refs_save=>{
-			 map { my $k=$_; $k=~s%^\Q$ref_id\E/%% ? ($k=>$refs_to_save->{$_}) : ()  }  keys %$refs_to_save
-		       },
-		       filename => $href, fh=>undef });
-	}
+        my $ref_id = $ref->{id};
+        my $pml = $ctxt->{'_ref'}->{$ref_id};
+        if ($pml) {
+          my $href;
+          if (exists($refs_to_save->{$ref_id})) {
+            $href = $refs_to_save->{$ref_id};
+          } else {
+            $href = $ref->{href}
+          }
+          $pml->save({ %$opts,
+                       refs_save=>{
+                         map { my $k=$_; $k=~s%^\Q$ref_id\E/%% ? ($k=>$refs_to_save->{$_}) : ()  }  keys %$refs_to_save
+                       },
+                       filename => $href, fh=>undef });
+        }
       }
     }
   }
@@ -493,11 +493,21 @@ sub _knit_code {
                          } else {
                            _warn("Knit-file '$rf_href' ('$prefix') has no index - cannot knit back!\n");
                          }
-        	       }
+                       }
                      }`;
   } else {
     warn("Cannot KNIT ".$knit_decl_path." if there is no member/attribute with role='#ID'!");
   }
+}
+
+sub simplify {
+    my $filename = shift;
+    my $up  = File::Spec->updir;
+    my $sep = File::Spec->catfile(q(), q());
+    while($filename =~ /\Q$sep$up$sep/) {
+        $filename =~ s/\Q$sep\E?[^$sep]*\Q$sep$up$sep/$sep/;
+    }
+    return $filename;
 }
 
 sub compile_schema {
@@ -524,8 +534,8 @@ sub compile_schema {
     $path =~ s/^!// if $path;
     return if $decl_type == PML_ATTRIBUTE_DECL ||
       $decl_type == PML_MEMBER_DECL    ||
-	$decl_type == PML_TYPE_DECL      ||
-	  $decl_type == PML_ELEMENT_DECL;
+        $decl_type == PML_TYPE_DECL      ||
+          $decl_type == PML_ELEMENT_DECL;
     if ($decl_type == PML_ROOT_DECL) {
       my $name = $decl->get_name;
       my $cdecl = $decl->get_content_decl;
@@ -541,30 +551,30 @@ sub compile_schema {
       print $out '<`.$decl->get_name.q` xmlns="`.PML_NS.q`"';`;
       # we need to know attributes now
       if ($cdecl_type == PML_CONSTANT_DECL ||
-	  $cdecl_type == PML_STRUCTURE_DECL) {
-	for my $attr ($cdecl->get_attributes) {
-	  if ($attr->is_required) {
-	    $sub.=q`
+          $cdecl_type == PML_STRUCTURE_DECL) {
+        for my $attr ($cdecl->get_attributes) {
+          if ($attr->is_required) {
+            $sub.=q`
               $v = $data->{'`.$attr->get_name.q`'};
               $v = '' unless defined $v;
               $v =~ s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
               print $out ' `.$attr->get_name.q`="'.$v.'"';
           `;
-	  } else {
-	    $sub.=q`
+          } else {
+            $sub.=q`
               $v = $data->{'`.$attr->get_name.q`'};
               if (defined($v) && length($v)) {
                 $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
                 print $out ' `.$attr->get_name.q`="'.$v.'"';
               }
           `;
-	  }
-	}
+          }
+        }
       }
       # NOTE: using _^_ as indentation replacement!
       my $no_end_indent =
-	($cdecl_type == PML_SEQUENCE_DECL and
-	 $cdecl->is_mixed);
+        ($cdecl_type == PML_SEQUENCE_DECL and
+         $cdecl->is_mixed);
       my $psub = q`
       print $out ">\n",
                  "_^_<head>\n";
@@ -573,7 +583,7 @@ sub compile_schema {
       # remove /../ from filename, URI::rel gives strange results for base containing them
       my $filename = $ctxt->{_filename};
       $filename = $filename->path if ref $filename and index($filename,'file:/') == 0;
-      $filename = Cwd::realpath($filename) if -e $filename;
+      $filename = simplify($filename) if -e $filename;
 
       if (defined $inline and length $inline) {
         print $out qq(_^__^_<schema>\n),$inline,qq(    </schema>\n);
@@ -591,26 +601,26 @@ sub compile_schema {
       }
       my $references = $ctxt->{'_references'};
       if (ref($references) and keys(%$references)) {
-	my $named = $ctxt->{'_refnames'};
-	my %names = $named ? (map {
-	my $name = $_;
-	map { $_ => $name } (ref($named->{$_}) ? @{$named->{$_}} : $named->{$_})
+        my $named = $ctxt->{'_refnames'};
+        my %names = $named ? (map {
+        my $name = $_;
+        map { $_ => $name } (ref($named->{$_}) ? @{$named->{$_}} : $named->{$_})
       } keys %$named) : ();
-	print $out qq(_^__^_<references>\n);
-	foreach my $id (sort keys %$references) {
-	  my $href;
-	  if (exists($refs_to_save->{$id})) {
-	    # effectively rename the file reference
-	    $href = $references->{$id} = $refs_to_save->{$id}
-	  } else {
-	    $href = $references->{$id};
-	  }
-	  $href=Treex::PML::IO::make_relative_URI($href,$filename);
+        print $out qq(_^__^_<references>\n);
+        foreach my $id (sort keys %$references) {
+          my $href;
+          if (exists($refs_to_save->{$id})) {
+            # effectively rename the file reference
+            $href = $references->{$id} = $refs_to_save->{$id}
+          } else {
+            $href = $references->{$id};
+          }
+          $href=Treex::PML::IO::make_relative_URI($href,$filename);
           my $name = $names{$id};
           for ($id,$href, (defined $name ? $name : ())) { s/&/&amp;/g;  s/</&lt;/g;  s/"/&quot;/g; }
-	  print $out qq(_^__^__^_<reffile id="${id}").(defined $name ? qq( name="${name}") : ()).qq( href="${href}" />\n);
-	}
-	print $out qq(_^__^_</references>\n);
+          print $out qq(_^__^__^_<reffile id="${id}").(defined $name ? qq( name="${name}") : ()).qq( href="${href}" />\n);
+        }
+        print $out qq(_^__^_</references>\n);
       }
       print $out "_^_</head>";
       $handlers{ '`.$cpath.q`' }->(undef,$data);
@@ -638,200 +648,200 @@ sub compile_schema {
            $close = '/>';
            print $out `._indent().q`'<'.$tag if length $tag;`;
       for my $attr ($decl->get_attributes) {
-	my $name = $attr->get_name;
-	if ($attr->is_required) {
-	  $sub.=q`
+        my $name = $attr->get_name;
+        if ($attr->is_required) {
+          $sub.=q`
               $v = $data->{'`.$name.q`'};
               $v='' unless defined $v;
               $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
               print $out ' `.$name.q`'.'="'.$v.'"';
           `;
-	} else {
-	  $sub.=q`
+        } else {
+          $sub.=q`
               $v = $data->{'`.$name.q`'};
               if (defined($v) && length($v)) {
                 $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
                 print $out ' `.$name.q`'.'="'.$v.'"';
               }
           `;
-	}
+        }
       }
       $sub .= q`
          }`._indent_inc();
       my $this_trees_type;
       for my $m ($decl->get_members) {
-	next if $m->is_attribute;
-	my $name = $m->get_name;
-	my $mdecl = $m->get_content_decl;
-	my $mdecl_type = $mdecl->get_decl_type;
-	$sub.=q`
+        next if $m->is_attribute;
+        my $name = $m->get_name;
+        my $mdecl = $m->get_content_decl;
+        my $mdecl_type = $mdecl->get_decl_type;
+        $sub.=q`
          $v = $data->{'`.$name.q`'};`;
-	my $close_brace=0;
-	my $ignore_required=0;
-	if ($WITH_TREES and $decl->get_role eq '#NODE' and $m->get_role eq '#CHILDNODES') {
-	  $close_brace=1;
-	  $sub.=q`
+        my $close_brace=0;
+        my $ignore_required=0;
+        if ($WITH_TREES and $decl->get_role eq '#NODE' and $m->get_role eq '#CHILDNODES') {
+          $close_brace=1;
+          $sub.=q`
            if (UNIVERSAL::DOES::does($data,'Treex::PML::Node')) {
              if (defined $close) { undef $close; print $out '>'; }`;
-	  if ($mdecl_type == PML_SEQUENCE_DECL) {
-	    $sub .= _write_children_seq($name,$mdecl);
-	  } elsif ($mdecl_type == PML_LIST_DECL) {
-	    $sub .= _write_children_list($name,$mdecl);
-	  }
-	  $sub.=q`
+          if ($mdecl_type == PML_SEQUENCE_DECL) {
+            $sub .= _write_children_seq($name,$mdecl);
+          } elsif ($mdecl_type == PML_LIST_DECL) {
+            $sub .= _write_children_list($name,$mdecl);
+          }
+          $sub.=q`
            } else { `;
-	} elsif ($WITH_TREES and ($m->get_role eq '#TREES' or $mdecl->get_role eq '#TREES')) {
-	  $close_brace=1;
-	  $this_trees_type = $mdecl;
-	  $ignore_required=1;
-	  $sub.=q`
+        } elsif ($WITH_TREES and ($m->get_role eq '#TREES' or $mdecl->get_role eq '#TREES')) {
+          $close_brace=1;
+          $this_trees_type = $mdecl;
+          $ignore_required=1;
+          $sub.=q`
            if (!$have_trees and !defined $v and (!defined($pml_trees_type) or $pml_trees_type==$this_trees_type)) {
              $have_trees=1;`;
-	  if ($m->is_required) {
-	    $sub.=q`
+          if ($m->is_required) {
+            $sub.=q`
                  warn "Member '`.$path.'/'.$name.q`' with role #TREES is required but there are no trees, writing empty tag!\n"
                    if !$ctxt->{_trees} and @{$ctxt->{_trees}};`;
-	  }
-	  $sub.=q`
+          }
+          $sub.=q`
              if (defined $close) { undef $close; print $out '>'; }
              print $out `._indent().q`'<`.$name.q`>';`._indent_inc();
-	  if ($mdecl_type == PML_SEQUENCE_DECL) {
-	    $sub .= _write_trees_seq($mdecl);
-	  } elsif ($mdecl_type == PML_LIST_DECL) {
-	    $sub .= _write_trees_list($mdecl);
-	  }
-	  $sub.=_indent_dec().q`
+          if ($mdecl_type == PML_SEQUENCE_DECL) {
+            $sub .= _write_trees_seq($mdecl);
+          } elsif ($mdecl_type == PML_LIST_DECL) {
+            $sub .= _write_trees_list($mdecl);
+          }
+          $sub.=_indent_dec().q`
              if (defined $close) { undef $close; print $out '>'; }
              print $out `._indent().q`'</`.$name.q`>';
            } else { `;
-	}
-	if ($mdecl_type == PML_CONSTANT_DECL and !$m->is_required) {
-	  # do not write
-	  $sub.=q`
+        }
+        if ($mdecl_type == PML_CONSTANT_DECL and !$m->is_required) {
+          # do not write
+          $sub.=q`
              if (defined $v and (ref($v) or length $v and $v ne "`.quotemeta($mdecl->get_value).q`")) {
                warn "Disregarding invalid constant value in member '`.$name.q`': '$v'!\n";
              }`;
-	} elsif ($m->get_role eq '#KNIT') {
-	  my $knit_name = $m->get_knit_name;
-	  my $knit_decl = $m->get_knit_content_decl();
-	  my $knit_decl_path = $knit_decl->get_decl_path;
-	  $knit_decl_path=~s/^!//;
-	    $sub.=q`
-	     if (defined $v and !ref $v and length $v) {
+        } elsif ($m->get_role eq '#KNIT') {
+          my $knit_name = $m->get_knit_name;
+          my $knit_decl = $m->get_knit_content_decl();
+          my $knit_decl_path = $knit_decl->get_decl_path;
+          $knit_decl_path=~s/^!//;
+            $sub.=q`
+             if (defined $v and !ref $v and length $v) {
                if (defined $close) { undef $close; print $out '>'; }
-	       $handlers{'`.$path.'/'.$name.q`' }->('`.$name.q`',$v);
-	     } else {`;
-	    unless ($name eq $knit_name) {
-	      $sub .= q`
-   	       $v = $data->{'`.$knit_name.q`'};`;
-	    }
-	    $sub .=  q`
+               $handlers{'`.$path.'/'.$name.q`' }->('`.$name.q`',$v);
+             } else {`;
+            unless ($name eq $knit_name) {
+              $sub .= q`
+                  $v = $data->{'`.$knit_name.q`'};`;
+            }
+            $sub .=  q`
                if (defined $close) { undef $close; print $out '>'; }
                if (ref $v) {`;
-	  if ($KEEP_KNIT) {
-	    $sub .=  q`
+          if ($KEEP_KNIT) {
+            $sub .=  q`
                  $handlers{'`.$knit_decl_path.q`' }->('`.$name.q`',$v);`;
-	  } else {
-	    $sub.=_knit_code($knit_decl,$knit_decl_path,$name);
-	  }
-	  $sub .=  q`
+          } else {
+            $sub.=_knit_code($knit_decl,$knit_decl_path,$name);
+          }
+          $sub .=  q`
                }`;
-	  if ($m->is_required) {
-	    $sub.=q` else {
+          if ($m->is_required) {
+            $sub.=q` else {
                  warn "Required member '`.$path.'/'.$knit_name.q`' missing, writing empty tag!\n";
                  print $out `._indent().q`'<`.$knit_name.q`/>';
                }`;
-	  }
-	  $sub.=
-	    q`
+          }
+          $sub.=
+            q`
              }`;
-	  $sub .= q`
+          $sub .= q`
            }` if $close_brace;
-	} elsif ($mdecl_type == PML_LIST_DECL and $mdecl->get_role eq '#KNIT') {
-	  my $knit_name = $m->get_knit_name;
-	  my $knit_decl = $mdecl->get_knit_content_decl();
-	  my $knit_decl_path = $knit_decl->get_decl_path;
-	  $knit_decl_path=~s/^!//;
-	  if ($name ne $knit_name) {
-	    $sub.=q`
-	     if (ref $v) {
+        } elsif ($mdecl_type == PML_LIST_DECL and $mdecl->get_role eq '#KNIT') {
+          my $knit_name = $m->get_knit_name;
+          my $knit_decl = $mdecl->get_knit_content_decl();
+          my $knit_decl_path = $knit_decl->get_decl_path;
+          $knit_decl_path=~s/^!//;
+          if ($name ne $knit_name) {
+            $sub.=q`
+             if (ref $v) {
                if (defined $close) { undef $close; print $out '>'; }
-	       $handlers{'`.$path.'/'.$name.q`' }->('`.$name.q`',$v);
-	     } else {
+               $handlers{'`.$path.'/'.$name.q`' }->('`.$name.q`',$v);
+             } else {
                $v = $data->{'`.$knit_name.q`'};`;
-	  }
-	  if ($m->is_required) {
-	    $sub.=q` if (!ref $v) {
+          }
+          if ($m->is_required) {
+            $sub.=q` if (!ref $v) {
                  warn "Required member '`.$path.'/'.$knit_name.q`' missing, writing empty tag!\n";
                  if (defined $close) { undef $close; print $out '>'; }
                  print $out `._indent().q`'<`.$knit_name.q`/>';
                } else {`;
-	  } else {
-	    $sub .= q`
+          } else {
+            $sub .= q`
                if (ref $v) {
                  if (defined $close) { undef $close; print $out '>'; }`;
-	  }
-	  if ($KEEP_KNIT) {
-	    if (!$WRITE_SINGLE_LM) {
-	      $sub .=  q`
+          }
+          if ($KEEP_KNIT) {
+            if (!$WRITE_SINGLE_LM) {
+              $sub .=  q`
                  if (@$v==1 and defined($v->[0]) and !(UNIVERSAL::isa($v->[0],'HASH') and keys(%{$v->[0]})==0)) {
                    $handlers{'`.$knit_decl_path.q`' }->('`.$name.q`',$v->[0]);
                  } else {`;
-	    }
-	    $sub .=  q`
+            }
+            $sub .=  q`
                    print $out `._indent().q`'<`.$name.q`>';`._indent_inc().q`
                    $handlers{'`.$knit_decl_path.q`' }->('LM',$_) for @$v;`._indent_dec().q`
                    print $out `._indent().q`'</`.$name.q`>';`;
-	    $sub .=  q`
+            $sub .=  q`
                  }` if !$WRITE_SINGLE_LM;
-	  } else {
-	    if (!$WRITE_SINGLE_LM) {
-	      $sub .=  q`
+          } else {
+            if (!$WRITE_SINGLE_LM) {
+              $sub .=  q`
                  if (@$v==1) {
                    if (defined $close) { undef $close; print $out '>'; }
                    $v=$v->[0];
                    `._knit_code($knit_decl,$knit_decl_path,$name).q`
                  } else {`;
-	    }
-	    $sub .=  q`
+            }
+            $sub .=  q`
                    if (defined $close) { undef $close; print $out '>'; }
                    print $out `._indent().q`'<`.$name.q`>';`._indent_inc().q`
                    my $l = $v;
                    for $v (@$l) {`._knit_code($knit_decl,$knit_decl_path,'LM').q`
                    }`._indent_dec().q`
                    print $out `._indent().q`'</`.$name.q`>';`;
-	    $sub .=  q`
+            $sub .=  q`
                  }` if !$WRITE_SINGLE_LM;
-	  }
-	  $sub.=
-	    q`
+          }
+          $sub.=
+            q`
                }`;
-	  if ($name ne $knit_name) {
-	    $sub.=q`
-	     }`;
-	  }
-	  $sub .= q`
+          if ($name ne $knit_name) {
+            $sub.=q`
+             }`;
+          }
+          $sub .= q`
            }` if $close_brace;
-	} else {
-# 	  if ($mdecl->get_role eq '#TREES') {
-# 	    $sub.=q`
+        } else {
+#           if ($mdecl->get_role eq '#TREES') {
+#             $sub.=q`
 #              $handlers{'`.$path.'/'.$name.q`' }->('`.$name.q`',$v);`;
-# 	  } else {
-	  $sub.=q`
+#           } else {
+          $sub.=q`
              if (defined $v and (ref $v or length $v)) {
                if (defined $close) { undef $close; print $out '>'; }
                $handlers{'`.$path.'/'.$name.q`' }->('`.$name.q`',$v);
              }`;
-#	}
-  	  if ($m->is_required and !$ignore_required ) {
-	    $sub.=q` else {
+#       }
+            if ($m->is_required and !$ignore_required ) {
+            $sub.=q` else {
                warn "Required member '`.$path.'/'.$name.q`' missing, writing empty tag!\n";
                if (defined $close) { undef $close; print $out '>'; }
                print $out `._indent().q`'<`.$name.q`/>';
              }`;
-	  }
-	}
-	$sub .= q`
+          }
+        }
+        $sub .= q`
            }` if $close_brace;
       }
       $sub .= _indent_dec().q`
@@ -857,43 +867,43 @@ sub compile_schema {
          my $ctag=$tag;`;
       my @attributes = $decl->get_attributes;
       if (@attributes) {
-	$sub.=q`
+        $sub.=q`
          if (defined $tag) {
            print $out `._indent().q`'<'.$tag ; $close = '>'; $ctag='';`;
-	for my $attr (@attributes) {
-	  my $name = $attr->get_name;
-	  if ($attr->is_required) {
-	    $sub.=q`
+        for my $attr (@attributes) {
+          my $name = $attr->get_name;
+          if ($attr->is_required) {
+            $sub.=q`
            $v = $data->{'`.$name.q`'};
            $v='' unless defined $v;
            $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
            print $out ' `.$name.q`'.'="'.$v.'"';
           `;
-	  } else {
-	    $sub.=q`
+          } else {
+            $sub.=q`
            $v = $data->{'`.$name.q`'};
            if (defined($v) && length($v)) {
              $v=~s/&/&amp;/g; $v=~s/</&lt;/g; $v=~s/"/&quot;/g;
              print $out ' `.$name.q`'.'="'.$v.'"';
            }
           `;
-	  }
-	}
-	$sub .= q`
+          }
+        }
+        $sub .= q`
          }`;
       } else {
-	$sub .= q`undef $tag;`;
+        $sub .= q`undef $tag;`;
       }
       my $cdecl = $decl->get_content_decl;
       # TODO: #TREES
       if ($cdecl) {
-	my $cdecl_type = $cdecl->get_decl_type;
-	my $cpath = $cdecl->get_decl_path;
-	$cpath =~ s/^!//;
-	my $close_brace=0;
-	if ($WITH_TREES and $decl->get_role eq '#NODE' and $cdecl->get_role eq '#CHILDNODES') {
-	  $close_brace=1;
-	  $sub.=q`
+        my $cdecl_type = $cdecl->get_decl_type;
+        my $cpath = $cdecl->get_decl_path;
+        $cpath =~ s/^!//;
+        my $close_brace=0;
+        if ($WITH_TREES and $decl->get_role eq '#NODE' and $cdecl->get_role eq '#CHILDNODES') {
+          $close_brace=1;
+          $sub.=q`
          if (UNIVERSAL::DOES::does($data,'Treex::PML::Node')) {
              undef $close;
              if (defined($ctag)) {
@@ -905,12 +915,12 @@ sub compile_schema {
                  print $out `._indent().q`qq{<$ctag/>};
                }
              }`;
-	  if ($cdecl_type == PML_SEQUENCE_DECL) {
-	    $sub .= _write_children_seq(undef,$cdecl);
-	  } elsif ($cdecl_type == PML_LIST_DECL) {
-	    $sub .= _write_children_list(undef,$cdecl);
-	  }
-	  $sub.=q`
+          if ($cdecl_type == PML_SEQUENCE_DECL) {
+            $sub .= _write_children_seq(undef,$cdecl);
+          } elsif ($cdecl_type == PML_LIST_DECL) {
+            $sub .= _write_children_list(undef,$cdecl);
+          }
+          $sub.=q`
            if ($data->firstson) {
              if (defined($ctag) and length($ctag)) {
                print $out `._indent().q`qq{</$ctag>};
@@ -919,23 +929,23 @@ sub compile_schema {
              }
            }
          } else { `;
-	}
-	$sub.=q`
+        }
+        $sub.=q`
            $v = $data->{'#content'};`;
-	$sub.=q`
+        $sub.=q`
            undef $close;
            if (defined $v and (ref $v or length $v)) {
              $handlers{'`.$cpath.q`' }->($ctag,$v);
              my $ref = ref($v);
              print $out `._indent().q`'' if !$ctag and $ref and !((UNIVERSAL::DOES::does($v,'Treex::PML::Alt')`.($WRITE_SINGLE_LM ? '' : q` or UNIVERSAL::DOES::does($v,'Treex::PML::List')`)
-	       .q`) and @$v==1 and defined($v->[0]) and !(UNIVERSAL::isa($v->[0],'HASH') and keys(%{$v->[0]})==0));
+               .q`) and @$v==1 and defined($v->[0]) and !(UNIVERSAL::isa($v->[0],'HASH') and keys(%{$v->[0]})==0));
            } else {
              if (defined($ctag) and length($ctag)) { print $out `._indent().q`qq{<$ctag/>} } else { $close='/>'; }
            }`;
-	$sub .= q`
+        $sub .= q`
          }` if $close_brace;
       } else {
-	$sub .= q`
+        $sub .= q`
          if (defined($ctag) and length($ctag)) { print $out `._indent().q`qq{<$ctag/>} } else {
          $close='/>'; }`;
       }
@@ -950,7 +960,7 @@ sub compile_schema {
       #    print $path,"\n";
       my $src = $schema_name.'__generated_write_sequence@'.$path;
       $src=~y{/}{@};
-	# TODO: check it's a Seq, warn about on undefined element
+        # TODO: check it's a Seq, warn about on undefined element
       local $INDENT=-1 if $decl->is_mixed;
       my $sub = q`#line 1 ".pml_compile.d/`.$src.q`"
        sub {
@@ -958,7 +968,7 @@ sub compile_schema {
          my ($k,$v);
          unless (defined $data) {`;
       if ($WITH_TREES and $decl->get_role eq '#TREES') {
-	$sub .= q`
+        $sub .= q`
            if (!$have_trees and (!defined($pml_trees_type) or $pml_trees_type==$decl)) {
              print $out (length($tag) ? `._indent().q`"<$tag>" : '>') if defined $tag;
              $have_trees=1;`._indent_inc()._write_trees_seq($decl)._indent_dec().q`
@@ -967,14 +977,14 @@ sub compile_schema {
              print $out defined $tag ? '/>' : '>' if !$tag;
            }`;
       } else {
-	$sub .= q`
+        $sub .= q`
            print $out defined $tag ? '/>' : '>' if !$tag;`;
       }
       $sub .= q`
            return;
          }
          print $out (length($tag) ? `._indent().q`"<$tag>" : '>') if defined $tag;`
-	._indent_inc()._write_seq($decl,$path,'$data')._indent_dec();
+        ._indent_inc()._write_seq($decl,$path,'$data')._indent_dec();
       $sub.=q`
          if (defined $tag and length $tag) {
            print $out `._indent().q`"</$tag>";
@@ -989,14 +999,14 @@ sub compile_schema {
       $cpath=~s/^!//;
       my $src = $schema_name.'__generated_write_list@'.$path;
       $src=~y{/}{@};
-	# TODO: check it's a List
+        # TODO: check it's a List
       my $sub = q`#line 1 ".pml_compile.d/`.$src.q`"
        sub {
          my ($tag,$data)=@_;
          my ($v);
          if (!defined $data or !@$data) {`;
       if ($WITH_TREES and $decl->get_role eq '#TREES') {
-	$sub .= q`
+        $sub .= q`
            if (!$have_trees and (!defined($pml_trees_type) or $pml_trees_type==$decl)) {
              print $out (length($tag) ? `._indent().q`"<$tag>" : '>') if defined $tag;
              $have_trees=1;`._indent_inc()._write_trees_list($decl)._indent_dec().q`
@@ -1007,12 +1017,12 @@ sub compile_schema {
              return;
            } `;
       } else {
-	$sub .= q`
+        $sub .= q`
            print $out defined $tag ? '/>' : '>' if !$tag;
            return;`;
       }
       if (!$WRITE_SINGLE_LM) {
-	$sub .= q`
+        $sub .= q`
          } elsif (@$data==1 and defined($data->[0]) and !(UNIVERSAL::isa($data->[0],'HASH') and keys(%{$data->[0]})==0)) {
            print $out '>' if defined $tag and !length $tag;
            $handlers{ '`.$cpath.q`' }->($tag || 'LM',$data->[0]);`;
@@ -1038,7 +1048,7 @@ sub compile_schema {
       $cpath=~s/^!//;
       my $src = $schema_name.'__generated_write_alt@'.$path;
       $src=~y{/}{@};
-	# TODO: check it's an Alt
+        # TODO: check it's an Alt
       my $sub = q`#line 1 ".pml_compile.d/`.$src.q`"
        sub {
          my ($tag,$data)=@_;
@@ -1089,9 +1099,9 @@ sub compile_schema {
     } elsif ($decl_type == PML_CHOICE_DECL) {
       my $value_hash = $decl->{value_hash};
       unless ($value_hash) {
-	$value_hash={};
-	@{$value_hash}{@{$decl->{values}}}=();
-	$decl->{value_hash}=$value_hash;
+        $value_hash={};
+        @{$value_hash}{@{$decl->{values}}}=();
+        $decl->{value_hash}=$value_hash;
       }
       my $src = $schema_name.'__generated_write_choice@'.$path;
       $src=~y{/}{@};
@@ -1133,20 +1143,20 @@ sub compile_schema {
       my ($decl)=@_;
       my $decl_type=$decl->get_decl_type;
       if ($decl_type == PML_ATTRIBUTE_DECL ||
-	    $decl_type == PML_MEMBER_DECL ||
-	      $decl_type == PML_ELEMENT_DECL
-	     ) {
-	my $parent = $decl->get_parent_decl;
-	my $path = $parent->get_decl_path . '/'. $decl->get_name;
-	$path =~ s/^!// if $path;
-	my $mdecl;
-	if (!exists($handlers{$path})) {
-	  $mdecl ||= $decl->get_content_decl;
-	  my $mpath = $mdecl->get_decl_path;
-	  $mpath =~ s/^!// if $mpath;
-	  #      print "mapping $path -> $mpath ... $handlers{$mpath}\n";
-	  $handlers{$path} = $handlers{$mpath};
-	}
+            $decl_type == PML_MEMBER_DECL ||
+              $decl_type == PML_ELEMENT_DECL
+             ) {
+        my $parent = $decl->get_parent_decl;
+        my $path = $parent->get_decl_path . '/'. $decl->get_name;
+        $path =~ s/^!// if $path;
+        my $mdecl;
+        if (!exists($handlers{$path})) {
+          $mdecl ||= $decl->get_content_decl;
+          my $mpath = $mdecl->get_decl_path;
+          $mpath =~ s/^!// if $mpath;
+          #      print "mapping $path -> $mpath ... $handlers{$mpath}\n";
+          $handlers{$path} = $handlers{$mpath};
+        }
       }
     });
 }

@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.10'; # version template
+  $VERSION='2.04'; # version template
 }
 no warnings 'uninitialized';
 use Carp;
@@ -259,19 +259,19 @@ sub init {
     return 0 unless
       ($value ne q{} and 
        $value =~ /
-	    ^
-	    (?:[+-])?		    # sign
+            ^
+            (?:[+-])?           # sign
             (?:
-	      (?:INF)		    # infinity
-	    | (?:NaN)		    # not a number
-	    | (?:\d+(?:\.\d+)?)	    # mantissa
-	      (?:[eE]		    # exponent
-		([+-])?		    # sign	   ($1)
-		(\d+)		    # value        ($2)
-	      )?
-	    )
-	    $
-	/x);
+              (?:INF)           # infinity
+            | (?:NaN)           # not a number
+            | (?:\d+(?:\.\d+)?) # mantissa
+              (?:[eE]           # exponent
+                ([+-])?         # sign   ($1)
+                (\d+)           # value  ($2)
+              )?
+            )
+            $
+        /x);
     # TODO: need to test bounds of mantissa ( < 2^24 )
     $$exp = ($1 || '') . ($2 || '') if ref($exp);
     return 1;
@@ -294,66 +294,66 @@ sub init {
     my $value = shift;
     return 0 
       unless length $value and $value =~ /
-	    ^
-	    -?                  # sign
-	    P                   # date
-	     (?:\d+Y)?            # years
-	     (?:\d+M)?            # months
-	     (?:\d+D)?            # days
-	    (?:T                # time
-             (?:\d+H)?	          # hours
-	     (?:\d+M)?	          # minutes
-	     (?:\d(?:\.\d+)?S)?   # seconds
+            ^
+            -?                  # sign
+            P                   # date
+             (?:\d+Y)?          # years
+             (?:\d+M)?          # months
+             (?:\d+D)?          # days
+            (?:T                # time
+             (?:\d+H)?          # hours
+             (?:\d+M)?          # minutes
+             (?:\d(?:\.\d+)?S)? # seconds
             )?
-	    $ 
-	/x;
+            $ 
+        /x;
   };
   
   my $integer = $format_re{integer} = qr(^\s*[+-]?\d+\s*$);
   $format_re{long} = sub {
     my $val = shift;
     return ($val =~ $integer and
-	    $val >= -9223372036854775808 and
+            $val >= -9223372036854775808 and
             $val <=  9223372036854775807) ? 1 : 0;
   };
   $format_re{int} = sub {
     my $val = shift;
     return ($val =~ $integer and
-	    $val >= -2147483648 and
+            $val >= -2147483648 and
             $val <=  2147483647) ? 1 : 0;
   };
   $format_re{short} = sub {
     my $val = shift;
     return ($val =~ $integer and
-	    $val >= -32768 and
+            $val >= -32768 and
             $val <=  32767) ? 1 : 0;
   };
   $format_re{byte} = sub {
     my $val = shift;
     return ($val =~ $integer and
-	    $val >= -128 and
+            $val >= -128 and
             $val <=  127) ? 1 : 0;
   };
   my $nonNegativeInteger=$format_re{nonNegativeInteger};
   $format_re{unsignedLong} = sub {
     my $val = shift;
     return ($val =~ $nonNegativeInteger and
-	    $val <= 18446744073709551615)
+            $val <= 18446744073709551615)
   };
   $format_re{unsignedInt} = sub {
     my $val = shift;
     return ($val =~ $nonNegativeInteger and
-	    $val <= 4294967295)
+            $val <= 4294967295)
   };
   $format_re{unsignedShort} = sub {
     my $val = shift;
     return ($val =~ $nonNegativeInteger and
-	    $val <= 65535)
+            $val <= 65535)
   };
   $format_re{unsignedByte} = sub {
     my $val = shift;
     return ($val =~ $nonNegativeInteger and
-	    $val <= 255)
+            $val <= 255)
   };
 
   sub _check_time {
@@ -362,11 +362,11 @@ sub init {
     return 
       ((length($value) and 
       $value =~ m(^
-	 (\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?  # hour:min:sec
-	 (?:Z|[-+]\d{2}:\d{2})?      # zone
+         (\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?  # hour:min:sec
+         (?:Z|[-+]\d{2}:\d{2})?      # zone
       $)x and
        ((!$no_hour24 and $1 == 24 and $2 == 0 and $3 == 0 and $4 == 0) or
-	0 <= $1 and $1 <= 23 and
+        0 <= $1 and $1 <= 23 and
         0 <= $2 and $2 <= 59 and 
         0 <= $3 and $3 <= 59)
       ) ? 1 : 0);
@@ -376,12 +376,12 @@ sub init {
     return 
       (length($value) and 
        $value =~ /
-	 ^
-	   [-+]?	          # sign
-	   (?:[1-9]\d{4,}|\d{4}) # year
-	   -(\d{2})               # month ($1)
-           -(\d{2})               # day ($2)
-	 $
+         ^
+           [-+]?                 # sign
+           (?:[1-9]\d{4,}|\d{4}) # year
+           -(\d{2})              # month ($1)
+           -(\d{2})              # day ($2)
+         $
        /x
       and $1>=1 and $1<=12
       and $2>= 1 and $2<=31
@@ -402,11 +402,11 @@ sub init {
     return 
       (length($value) and 
        $value =~ /
-	 ^
-	   [-+]?	           # sign
-	   (?:[1-9]\d{4,}|\d{4})  # year
-	   -(\d{2})                # month ($1)
-	 $
+         ^
+           [-+]?                  # sign
+           (?:[1-9]\d{4,}|\d{4})  # year
+           -(\d{2})               # month ($1)
+         $
        /x
       and $1>=1 and $1<=12
       ) ? 1 : 0;
@@ -416,10 +416,10 @@ sub init {
     return 
       (length($value) and 
        $value =~ /
-	 ^
-	   [-+]?	           # sign
-	   (?:[1-9]\d{4,}|\d{4})  # year
-	 $
+         ^
+           [-+]?                  # sign
+           (?:[1-9]\d{4,}|\d{4})  # year
+         $
        /x) ? 1 : 0;
   };
   $format_re{gMonthDay} = sub {
@@ -428,7 +428,7 @@ sub init {
       (length($value) and 
        $value =~ /^--(\d{2})-(\d{2})$/ # --MM-DD
        and $1>=1 and $1<=12
-       and $2>= 1 and $2<=31	 
+       and $2>= 1 and $2<=31
       ) ? 1 : 0;
   };
   $format_re{gDay} = sub {
@@ -436,7 +436,7 @@ sub init {
     return 
       (length($value) and 
        $value =~ /^---(\d{2})$/ # ---DD
-       and $1>= 1 and $1<=31	 
+       and $1>= 1 and $1<=31
       ) ? 1 : 0;
   };
   $format_re{gMonth} = sub {
@@ -461,7 +461,7 @@ sub check_string_format {
   my $re = $self->_get_format_checker($format);
   if (defined $re) {
     if ((ref($re) eq 'CODE' and !$re->($string))
-	 or (ref($re) ne 'CODE' and $string !~ $re)) {
+         or (ref($re) ne 'CODE' and $string !~ $re)) {
       return 0
     }
   } else {

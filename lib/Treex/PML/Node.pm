@@ -6,7 +6,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.10'; # version template
+  $VERSION='2.04'; # version template
 }
 use Carp;
 
@@ -347,12 +347,12 @@ sub set_type_by_name {
     if ($decl_type == PML_MEMBER_DECL() ||
         $decl_type == PML_ELEMENT_DECL() ||
         $decl_type == PML_TYPE_DECL() ||
-	$decl_type == PML_ROOT_DECL() ) {
+        $decl_type == PML_ROOT_DECL() ) {
       $type = $type->get_content_decl;
     }
     $decl_type = $type->get_decl_type;
     if ($decl_type == PML_CONTAINER_DECL() ||
-	$decl_type == PML_STRUCTURE_DECL()) {
+        $decl_type == PML_STRUCTURE_DECL()) {
       $node->set_type($type);
     } else {
       croak __PACKAGE__."::set_type_by_name: Incompatible type '$name' (neither a structure nor a container)";
@@ -396,10 +396,10 @@ sub validate {
     my $mtype = $type->find($path);
     if ($mtype) {
       $mtype->validate_object($node->attr($path),
-			      {
-				path => $path,
-				log=>$log
-			       });
+                              {
+                                path => $path,
+                                log=>$log
+                               });
     } else {
       croak __PACKAGE__."::validate: can't determine data type from attribute-path '$path'!";
     }
@@ -541,7 +541,7 @@ sub previous {
   DIGDOWN: while ($node->{$firstson}) {
       $node = $node->{$firstson};
     LASTBROTHER: while ($node->{$rbrother}) {
-    	$node = $node->{$rbrother};
+            $node = $node->{$rbrother};
         next LASTBROTHER;
       }
       next DIGDOWN;

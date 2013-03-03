@@ -12,7 +12,7 @@ use Carp;
 use Treex::PML::Schema::Constants;
 
 BEGIN {
-  our $VERSION = '2.10'; # version template
+  our $VERSION = '2.04'; # version template
   require Exporter;
   import Exporter qw(import);
   our @EXPORT = (
@@ -564,7 +564,7 @@ sub for_each_decl {
   for my $d (qw(template type)) {
     if (ref $self->{$d}) {
       foreach (values %{$self->{$d}}) {
-	$_->for_each_decl($sub);
+        $_->for_each_decl($sub);
       }
     }
   }
@@ -579,10 +579,10 @@ sub _get_referred_types {
       my ($type)=@_;
       return unless ref($type);
       if (defined($type->{type}) and length($type->{type}) and !exists($referred->{$type->{type}})) {
-	# this type declaration reffers to another type - get it
-	my $resolved = $self->_resolve_type($type);
-	$referred->{$type->{type}} = $resolved;
-	$self->_get_referred_types($resolved,$referred) if ref $resolved;
+        # this type declaration reffers to another type - get it
+        my $resolved = $self->_resolve_type($type);
+        $referred->{$type->{type}} = $resolved;
+        $self->_get_referred_types($resolved,$referred) if ref $resolved;
       }
     });
 }
@@ -601,9 +601,9 @@ sub _import_type {
     unless (exists $self->{type}{$n}) {
       my $parent = $referred{$n}->{-parent};
       if (defined $parent) {
-	$self->{type}{$n}=Treex::PML::CloneValue($referred{$n},[$parent], [$self]);
+        $self->{type}{$n}=Treex::PML::CloneValue($referred{$n},[$parent], [$self]);
       } else {
-	$self->{type}{$n}=Treex::PML::CloneValue($referred{$n});
+        $self->{type}{$n}=Treex::PML::CloneValue($referred{$n});
       }
     } else {
       
@@ -614,7 +614,7 @@ sub _import_type {
 sub __fmt {
   my ($string,$fmt) =@_;
   $string =~ s{%(.)}{ $1 eq "%" ? "%" : 
-			exists($fmt->{$1}) ? $fmt->{$1} : "%$1" }eg;
+                        exists($fmt->{$1}) ? $fmt->{$1} : "%$1" }eg;
   return $string;
 }
 
@@ -639,19 +639,19 @@ sub check_revision {
 
   my $error = $opts->{revision_error} || 'Error: wrong schema revision of %f: %e';
   if ($opts->{revision} and
-	$self->_match_revision($opts->{revision})!=0) {
+        $self->_match_revision($opts->{revision})!=0) {
     croak(__fmt($error, { 'e' => "required $opts->{revision}, got $self->{revision}",
-			  'f' => $self->{URL}}));
+                          'f' => $self->{URL}}));
   } else {
     if ($opts->{minimal_revision} and
-	  $self->_match_revision($opts->{minimal_revision})<0) {
+          $self->_match_revision($opts->{minimal_revision})<0) {
       croak(__fmt($error, { 'e' => "required at least $opts->{minimal_revision}, got $self->{revision}",
-			    'f' => $self->{URL}}));
+                            'f' => $self->{URL}}));
     }
     if ($opts->{maximal_revision} and
-	  $self->_match_revision($opts->{maximal_revision})>0) {
+          $self->_match_revision($opts->{maximal_revision})>0) {
       croak(__fmt($error, { 'e' => "required at most $opts->{maximal_revision}, got $self->{revision}",
-			    'f' => $self->{URL}}));
+                            'f' => $self->{URL}}));
     }
   }
 }
@@ -693,9 +693,9 @@ sub convert_from_hash {
     $root->{'-xml_name'}='root';
     $root->{'-attributes'}=['name','type'];
     Treex::PML::Schema::Decl->convert_from_hash($root,
-				  $schema_hash,
-				  undef  # path = '' for root
-				 );
+                                  $schema_hash,
+                                  undef  # path = '' for root
+                                 );
   }
   my $types = $schema_hash->{type};
   if ($types) {
@@ -705,9 +705,9 @@ sub convert_from_hash {
       $decl->{'-xml_name'}='type';
       $decl->{'-attributes'}=['name'];
       Treex::PML::Schema::Decl->convert_from_hash($decl, 
-				    $schema_hash,
-				    '!'.$name
-				   );
+                                    $schema_hash,
+                                    '!'.$name
+                                   );
     }
   }
   return $schema_hash;
@@ -742,9 +742,9 @@ sub find_type_by_path {
     if ($path=~s{^!([^/]+)/?}{}) {
       $decl = $schema->get_type_by_name($1);
       if (defined $decl) {
-	$decl = $decl->get_content_decl;
+        $decl = $decl->get_content_decl;
       } else {
-	return;
+        return;
       }
     } elsif ($path=~s{^/}{} or !$decl) {
       $decl = $schema->get_root_decl->get_content_decl;
@@ -752,59 +752,59 @@ sub find_type_by_path {
     for my $step (split /\//, $path,-1) {
       next if $step eq '.';
       if (ref($decl)) {
-	my $decl_is = $decl->get_decl_type;
-	if ($decl_is == PML_ATTRIBUTE_DECL ||
-	    $decl_is == PML_MEMBER_DECL ||
+        my $decl_is = $decl->get_decl_type;
+        if ($decl_is == PML_ATTRIBUTE_DECL ||
+            $decl_is == PML_MEMBER_DECL ||
             $decl_is == PML_ELEMENT_DECL ||
             $decl_is == PML_TYPE_DECL ) {
-	  $decl = $decl->get_knit_content_decl;
-	  next unless defined($step) and length($step);
-	  redo;
-	}
-	if ($decl_is == PML_LIST_DECL ||
-	    $decl_is == PML_ALT_DECL ) {
-	  $decl = $decl->get_knit_content_decl;
-	  next if ($step =~ /^\[[-+]?\d+\]$/ or
-		     (($decl_is == PML_LIST_DECL) ?
-			($step eq 'LM' or $step eq '[LIST]')
-		       :($step eq 'AM' or $step eq '[ALT]')));
-	  redo;
-	}
-	if ($decl_is == PML_STRUCTURE_DECL) {
-	  my $member = $decl->get_member_by_name($step);
-	  if ($member) {
-	    $decl = $member;
-	  } else {
-	    $member = $decl->get_member_by_name($step.'.rf');
-	    return unless $member;
-	    if ($member->get_knit_name eq $step) {
-	      $decl = $member;
-	    } else {
-	      return;
-	    }
-	  }
-	} elsif ($decl_is == PML_CONTAINER_DECL) {
-	  if ($step eq '#content') {
-	    $decl = $decl->get_content_decl;
-	    next;
-	  }
-	  my $attr = $decl->get_attribute_by_name($step);
-	  $decl =  $attr;
-	} elsif ($decl_is == PML_SEQUENCE_DECL) {
-	  $step =~ s/^\[\d+\]//; # name must follow
-	  $decl = $decl->get_element_by_name($step);
-	} elsif ($decl_is == PML_ROOT_DECL) {
-	  if (!(defined($step) and length($step)) or ($step eq $decl->get_name)) {
-	    $decl = $decl->get_content_decl;
-	  } else {
-	    return;
-	  }
-	} else {
-	  return;
-	}
+          $decl = $decl->get_knit_content_decl;
+          next unless defined($step) and length($step);
+          redo;
+        }
+        if ($decl_is == PML_LIST_DECL ||
+            $decl_is == PML_ALT_DECL ) {
+          $decl = $decl->get_knit_content_decl;
+          next if ($step =~ /^\[[-+]?\d+\]$/ or
+                     (($decl_is == PML_LIST_DECL) ?
+                        ($step eq 'LM' or $step eq '[LIST]')
+                       :($step eq 'AM' or $step eq '[ALT]')));
+          redo;
+        }
+        if ($decl_is == PML_STRUCTURE_DECL) {
+          my $member = $decl->get_member_by_name($step);
+          if ($member) {
+            $decl = $member;
+          } else {
+            $member = $decl->get_member_by_name($step.'.rf');
+            return unless $member;
+            if ($member->get_knit_name eq $step) {
+              $decl = $member;
+            } else {
+              return;
+            }
+          }
+        } elsif ($decl_is == PML_CONTAINER_DECL) {
+          if ($step eq '#content') {
+            $decl = $decl->get_content_decl;
+            next;
+          }
+          my $attr = $decl->get_attribute_by_name($step);
+          $decl =  $attr;
+        } elsif ($decl_is == PML_SEQUENCE_DECL) {
+          $step =~ s/^\[\d+\]//; # name must follow
+          $decl = $decl->get_element_by_name($step);
+        } elsif ($decl_is == PML_ROOT_DECL) {
+          if (!(defined($step) and length($step)) or ($step eq $decl->get_name)) {
+            $decl = $decl->get_content_decl;
+          } else {
+            return;
+          }
+        } else {
+          return;
+        }
       } else {
-#	warn "Can't follow type path '$path' (step '$step')\n";
-	return(undef); # ERROR
+#        warn "Can't follow type path '$path' (step '$step')\n";
+        return(undef); # ERROR
       }
     }
   } elsif (!$decl) {
@@ -813,12 +813,12 @@ sub find_type_by_path {
   my $decl_is = $decl && $decl->get_decl_type;
   return $noresolve ? $decl :
     $decl && (
-	      $decl_is == PML_ATTRIBUTE_DECL ||
-	      $decl_is == PML_MEMBER_DECL ||
-	      $decl_is == PML_ELEMENT_DECL ||
-	      $decl_is == PML_TYPE_DECL ||
+              $decl_is == PML_ATTRIBUTE_DECL ||
+              $decl_is == PML_MEMBER_DECL ||
+              $decl_is == PML_ELEMENT_DECL ||
+              $decl_is == PML_TYPE_DECL ||
               $decl_is == PML_ROOT_DECL
-	     )
+             )
       ? ($decl->get_knit_content_decl) : $decl;
 }
 
@@ -944,7 +944,7 @@ sub _find {
     my $cached = $cache->{ $type_ref };
     unless ($cached) {
       $cached = $cache->{ $type_ref } = [ $self->_find( $self->get_type_by_name($type_ref),
-							     $test, $first, $cache, $opts ) ];
+                                                             $test, $first, $cache, $opts ) ];
     }
     if ($decl_is == PML_CONTAINER_DECL) {
       push @result,  map { (defined($_) and length($_)) ? '#content/'.$_ : '#content' } @$cached;
@@ -960,7 +960,7 @@ sub _find {
   if ($decl_is == PML_STRUCTURE_DECL) {
     foreach my $member ($decl->get_members) {
       my @res = map { (defined($_) and length($_)) ? $member->get_name.'/'.$_ : $member->get_name }
-	$self->_find($member, $test, $first, $cache, $opts);
+        $self->_find($member, $test, $first, $cache, $opts);
       return $res[0] if ($first and @res);
       push @result,@res;
     }
@@ -968,19 +968,19 @@ sub _find {
     my $cdecl = $decl->get_content_decl;
     foreach my $attr ($decl->get_attributes) {
       my @res = map { (defined($_) and length($_)) ? $attr->get_name.'/'.$_ : $attr->get_name }
-	$self->_find($attr, $test, $first, $cache, $opts);
+        $self->_find($attr, $test, $first, $cache, $opts);
       return $res[0] if ($first and @res);
       push @result,@res;
     }
     if ($cdecl) {
       push @result,  map { (defined($_) and length($_)) ? '#content/'.$_ : '#content' } 
-	$self->_find($cdecl, $test, $first, $cache, $opts);
+        $self->_find($cdecl, $test, $first, $cache, $opts);
       return $result[0] if ($first and @result);
     }
   } elsif ($decl_is == PML_SEQUENCE_DECL) {
     foreach my $element ($decl->get_elements) {
       my @res = map { (defined($_) and length($_)) ? $element->get_name.$seq_bracket.'/'.$_ : $element->get_name.$seq_bracket }
-	$self->_find($element, $test, $first, $cache, $opts);
+        $self->_find($element, $test, $first, $cache, $opts);
       return $res[0] if ($first and @res);
       push @result,@res;
     }
@@ -991,10 +991,10 @@ sub _find {
     push @result, map { (defined($_) and length($_)) ? 'AM/'.$_ : 'AM' }
       $self->_find($decl->get_content_decl, $test, $first, $cache, $opts);
   } elsif ($decl_is == PML_TYPE_DECL ||
-	   $decl_is == PML_ROOT_DECL ||
+           $decl_is == PML_ROOT_DECL ||
            $decl_is == PML_ATTRIBUTE_DECL ||
            $decl_is == PML_MEMBER_DECL ||
-	   $decl_is == PML_ELEMENT_DECL ) {
+           $decl_is == PML_ELEMENT_DECL ) {
     push @result, $self->_find($decl->get_content_decl, $test, $first, $cache, $opts);
   }
   my %uniq;
@@ -1112,8 +1112,8 @@ sub validate_field {
   croak "Treex::PML::Schema::validate_field: Cannot determine data type for attribute-path '$path'" unless $type;
   return 
     $type->validate_object(Treex::PML::Instance::get_data($object,$path),{ path => $path,
-								  log => $log
-								 });
+                                                                  log => $log
+                                                                 });
 }
 
 
@@ -1171,12 +1171,12 @@ sub _get_paths_to_atoms {
     my $decl_is = $type->get_decl_type;
     next if $no_children and $type->get_role eq '#CHILDNODES';
     if ($decl_is == PML_TYPE_DECL ||
-	$decl_is == PML_ROOT_DECL ||
-	$decl_is == PML_ATTRIBUTE_DECL ||
-	$decl_is == PML_MEMBER_DECL ||
-	$decl_is == PML_ELEMENT_DECL  ||
-	(!$with_LM && $decl_is == PML_LIST_DECL) ||
-	(!$with_AM && $decl_is == PML_ALT_DECL)) {
+        $decl_is == PML_ROOT_DECL ||
+        $decl_is == PML_ATTRIBUTE_DECL ||
+        $decl_is == PML_MEMBER_DECL ||
+        $decl_is == PML_ELEMENT_DECL  ||
+        (!$with_LM && $decl_is == PML_LIST_DECL) ||
+        (!$with_AM && $decl_is == PML_ALT_DECL)) {
       $type = $type->get_knit_content_decl;
       next if $no_nodes and $type->get_role eq '#NODE';
       redo;
@@ -1188,12 +1188,12 @@ sub _get_paths_to_atoms {
     } elsif ($decl_is == PML_CONTAINER_DECL) {
       my $cdecl = $type->get_knit_content_decl;
       @members = ((map { [ $_, $_->get_name ] } $type->get_attributes),
-		    ($cdecl ? [$cdecl, '#content'] : ()));
+                    ($cdecl ? [$cdecl, '#content'] : ()));
     } elsif ($decl_is == PML_SEQUENCE_DECL) {
       if ($with_Seq_brackets) {
-	@members = map { [ $_, $_->get_name.'[0]' ] } $type->get_elements;
+        @members = map { [ $_, $_->get_name.'[0]' ] } $type->get_elements;
       } else {
-	@members = map { [ $_, $_->get_name ] } $type->get_elements;
+        @members = map { [ $_, $_->get_name ] } $type->get_elements;
       }
     } elsif ($decl_is == PML_LIST_DECL) {
       @members = [$type->get_knit_content_decl,'LM'];
@@ -1204,10 +1204,10 @@ sub _get_paths_to_atoms {
     }
     if (@members) {
       for my $m (@members) {
-	my ($mdecl,$name) = @$m;
-	local $seen->{$type}=1;
-	push @result, map { (defined($_) and length($_)) ? $name."/".$_ : $name }
-	  $self->_get_paths_to_atoms([$mdecl],$seen,$opts);
+        my ($mdecl,$name) = @$m;
+        local $seen->{$type}=1;
+        push @result, map { (defined($_) and length($_)) ? $name."/".$_ : $name }
+          $self->_get_paths_to_atoms([$mdecl],$seen,$opts);
       }
     }
   }
@@ -1291,28 +1291,28 @@ sub post_process {
      ) {
       my $parent_is = $parent->get_decl_type;
       if ($parent_is == PML_TYPE_DECL) {
-	$decl->{-path} = '!'.$parent->get_name;
+        $decl->{-path} = '!'.$parent->get_name;
       } elsif ($parent_is == PML_ROOT_DECL) {
-	$decl->{-path} = '';
+        $decl->{-path} = '';
       } elsif ($parent_is == PML_ATTRIBUTE_DECL ||
-	       $parent_is == PML_MEMBER_DECL    ||
-	       $parent_is == PML_ELEMENT_DECL) {
-	$decl->{-path} = $parent->{-parent}{-path}.'/'.$parent->get_name;
+               $parent_is == PML_MEMBER_DECL    ||
+               $parent_is == PML_ELEMENT_DECL) {
+        $decl->{-path} = $parent->{-parent}{-path}.'/'.$parent->get_name;
       } elsif ($parent_is == PML_CONTAINER_DECL and $decl_is != PML_ATTRIBUTE_DECL) {
-	$decl->{-path} = $parent->{-path}.'/#content';
+        $decl->{-path} = $parent->{-path}.'/#content';
       } elsif ($parent_is == PML_LIST_DECL) {
-	$decl->{-path} = $parent->{-path}.'/LM';
+        $decl->{-path} = $parent->{-path}.'/LM';
       } elsif ($parent_is == PML_ALT_DECL) {
-	$decl->{-path} = $parent->{-path}.'/AM';
+        $decl->{-path} = $parent->{-path}.'/AM';
       }
       if ($decl_is == PML_LIST_DECL and !$decl->{-decl} and $decl->{role} eq '#KNIT') {
-	# warn ("List $decl->{-path} with role=\"#KNIT\" must have a content type declaration: assuming <cdata format=\"PMLREF\">!\n");
-	__fix_knit_type($schema,$decl,$decl->{-path}.'/LM');
+        # warn ("List $decl->{-path} with role=\"#KNIT\" must have a content type declaration: assuming <cdata format=\"PMLREF\">!\n");
+        __fix_knit_type($schema,$decl,$decl->{-path}.'/LM');
       }
     } elsif ($decl_is == PML_MEMBER_DECL) {
       if (!$decl->{-decl} and $decl->{role} eq '#KNIT') {
-	# warn ("Member  $decl->{-parent}{-path}/$decl->{-name} with role=\"#KNIT\" must have a content type declaration: assuming <cdata format=\"PMLREF\">!\n");
-	__fix_knit_type($schema,$decl);
+        # warn ("Member  $decl->{-parent}{-path}/$decl->{-name} with role=\"#KNIT\" must have a content type declaration: assuming <cdata format=\"PMLREF\">!\n");
+        __fix_knit_type($schema,$decl);
       }
     }
   });
@@ -1342,14 +1342,14 @@ sub _traverse_data {
     $sub->($data,0) unless $hashes_only;
     foreach my $val (@$data) {
       if (ref($val) and !exists $seen->{$val}) {
-	_traverse_data($val,$sub,$seen,$hashes_only);
+        _traverse_data($val,$sub,$seen,$hashes_only);
       }
     }
   } elsif (UNIVERSAL::isa($data,'HASH')) {
     $sub->($data,1);
     foreach my $val (values %$data) {
       if (ref($val) and !exists $seen->{$val}) {
-	_traverse_data($val,$sub,$seen,$hashes_only);
+        _traverse_data($val,$sub,$seen,$hashes_only);
       }
     }
   }
@@ -1404,7 +1404,7 @@ __END__
 Prague Markup Language (PML) format:
 L<http://ufal.mff.cuni.cz/jazz/PML/>
 
-Tree editor TrEd: L<http://ufal.mff.cuni.cz/~pajas/tred>
+Tree editor TrEd: L<http://ufal.mff.cuni.cz/tred>
 
 Related packages: L<Treex::PML>, L<Treex::PML::Schema::Template>,
 L<Treex::PML::Schema::Decl>,

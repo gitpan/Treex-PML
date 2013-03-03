@@ -11,7 +11,7 @@ use Carp;
 use Data::Dumper;
 
 BEGIN {
-  our $VERSION = '2.10'; # version template
+  our $VERSION = '2.04'; # version template
 }
 use List::Util qw(first);
 use Scalar::Util qw(weaken);
@@ -186,9 +186,9 @@ sub load {
 
   if (exists $opts->{filename}) {
     $ctxt->set_filename( $opts->{use_resources}
-			   ? Treex::PML::FindInResourcePaths($opts->{filename})
-			   : $opts->{filename}
-		       );
+                           ? Treex::PML::FindInResourcePaths($opts->{filename})
+                           : $opts->{filename}
+                       );
   }
   my $reader;
   my $fh_to_close;
@@ -197,25 +197,25 @@ sub load {
     $reader = XML::LibXML::Reader->new(DOM => delete $opts->{dom}, %$READER_OPTS);
   } elsif (defined $opts->{fh}) {
     $reader = XML::LibXML::Reader->new(IO => $opts->{fh}, %$READER_OPTS,
-				       URI => $ctxt->{'_filename'},
-				       %$READER_OPTS
-				      );
+                                       URI => $ctxt->{'_filename'},
+                                       %$READER_OPTS
+                                      );
   } elsif (defined $opts->{string}) {
     $reader = XML::LibXML::Reader->new(string => $opts->{string}, %$READER_OPTS,
-				       URI => $ctxt->{'_filename'},
-				       %$READER_OPTS
-				      );
+                                       URI => $ctxt->{'_filename'},
+                                       %$READER_OPTS
+                                      );
   } elsif (defined $ctxt->{_filename}) {
     if ($ctxt->{_filename} eq '-') {
       $reader = XML::LibXML::Reader->new(FD => \*STDIN,
-					 %$READER_OPTS,
-					);
+                                         %$READER_OPTS,
+                                        );
     } else {
       $fh_to_close = open_uri($ctxt->{_filename});
       $reader = XML::LibXML::Reader->new(FD => $fh_to_close,
-					 URI => $ctxt->{_filename},
-					 %$READER_OPTS,
-					);
+                                         URI => $ctxt->{_filename},
+                                         %$READER_OPTS,
+                                        );
     }
   } else {
     croak("Treex::PML::Instance->load: at least one of filename, fh, string, or dom arguments are required!");
@@ -227,10 +227,10 @@ sub load {
     grep {
       my $id = $_->{id};
       if (defined($id) and length($id)) {
-	$_
+        $_
       } else {
-	warn(__PACKAGE__.": Skipping PML transform in ".$config->get_url." (required attribute id missing):".Dumper($_));
-	()
+        warn(__PACKAGE__.": Skipping PML transform in ".$config->get_url." (required attribute id missing):".Dumper($_));
+        ()
       }
     }
     (eval {
@@ -239,108 +239,108 @@ sub load {
   my $root_element = $reader->localName;
   my $root_ns = $reader->namespaceURI || '';
   if ($root_ns ne PML_NS
-	or grep { (($_->{ns}||'') eq PML_NS and ($_->{root}||'') eq $root_element) } @transform_map) {
+        or grep { (($_->{ns}||'') eq PML_NS and ($_->{root}||'') eq $root_element) } @transform_map) {
       if ($config and $config->get_root) {
       # TRANSFORM
       $reader->preserveNode;
       $reader->finish;
       my $dom = $reader->document;
       foreach my $transform (@transform_map) {
-	my $id = $transform->{'id'};
-	my ($in_xsl) = $transform->{in};
-	my $type = $in_xsl && $in_xsl->{'type'};
-	next unless ($type and $type =~ /^(?:xslt|perl|pipe|shell)$/);
-	my $test = $transform->{'test'};
-	_debug("Trying transformation rule '$id'");
-	if (($test or $transform->{ns} or $transform->{root})
-	    and (!$transform->{ns} or $transform->{ns} eq $root_ns)
-	    and (!$transform->{root} or $transform->{root} eq $root_element)
-	    and !$test or eval { $dom->find($test) }) {
-	  if ($type eq 'xslt') {
+        my $id = $transform->{'id'};
+        my ($in_xsl) = $transform->{in};
+        my $type = $in_xsl && $in_xsl->{'type'};
+        next unless ($type and $type =~ /^(?:xslt|perl|pipe|shell)$/);
+        my $test = $transform->{'test'};
+        _debug("Trying transformation rule '$id'");
+        if (($test or $transform->{ns} or $transform->{root})
+            and (!$transform->{ns} or $transform->{ns} eq $root_ns)
+            and (!$transform->{root} or $transform->{root} eq $root_element)
+            and !$test or eval { $dom->find($test) }) {
+          if ($type eq 'xslt') {
             if (eval { require XML::LibXSLT; 1 }) {
-	      my $in_xsl_href = URI->new(Encode::encode_utf8($in_xsl->get_member('href')));
-	      next unless $in_xsl_href;
-	      _debug("Transforming to PML with XSLT '$in_xsl_href'");
-	      $ctxt->{'_transform_id'} = $id;
-	      my $params = $in_xsl->content;
-	      my %params;
-	      %params = map { $_->{'name'} => $_->value } $params->values if $params;
-	      $in_xsl_href = Treex::PML::ResolvePath($config->{'_filename'}, $in_xsl_href, 1);
-	      my $xslt = XML::LibXSLT->new;
-	      my $in_xsl_parsed = $xslt->parse_stylesheet_file($in_xsl_href)
-	        || die("Cannot locate XSL stylesheet '$in_xsl_href' for transformation $id\n");
-	      $dom = $in_xsl_parsed->transform($dom,%params);
-	      $dom->setBaseURI($ctxt->{'_filename'}) if $dom and $dom->can('setBaseURI');
-	      $dom->setURI($ctxt->{'_filename'}) if $dom and $dom->can('setURI');
-	      $reader = XML::LibXML::Reader->new(DOM => $dom);
-	      $reader->nextElement();
-	      last;
+              my $in_xsl_href = URI->new(Encode::encode_utf8($in_xsl->get_member('href')));
+              next unless $in_xsl_href;
+              _debug("Transforming to PML with XSLT '$in_xsl_href'");
+              $ctxt->{'_transform_id'} = $id;
+              my $params = $in_xsl->content;
+              my %params;
+              %params = map { $_->{'name'} => $_->value } $params->values if $params;
+              $in_xsl_href = Treex::PML::ResolvePath($config->{'_filename'}, $in_xsl_href, 1);
+              my $xslt = XML::LibXSLT->new;
+              my $in_xsl_parsed = $xslt->parse_stylesheet_file($in_xsl_href)
+                || die("Cannot locate XSL stylesheet '$in_xsl_href' for transformation $id\n");
+              $dom = $in_xsl_parsed->transform($dom,%params);
+              $dom->setBaseURI($ctxt->{'_filename'}) if $dom and $dom->can('setBaseURI');
+              $dom->setURI($ctxt->{'_filename'}) if $dom and $dom->can('setURI');
+              $reader = XML::LibXML::Reader->new(DOM => $dom);
+              $reader->nextElement();
+              last;
             } else {
               warn "Cannot use XML::LibXSLT for transformation!\n";
             }
-	  } elsif ($type eq 'perl') {
-	    my $code = $in_xsl->get_member('command');
-	    next unless $code;
-	    _debug("Transforming to PML with Perl code: $code");
-	    $ctxt->{'_transform_id'} = $id;
-	    my $params = $in_xsl->content;
-	    my %params;
-	    %params = map { $_->{'name'} => $_->value } $params->values if $params;
-	    $dom = perl_transform($code, $dom, %params);
-	    die("Perl-based transformation '$id' failed: $@") if $@;
-	    die("Perl-based transformation didn't return a XML::LibXML::Document object!\n") unless
-	      (blessed($dom) and $dom->isa('XML::LibXML::Document'));
-	    $dom->setBaseURI($ctxt->{'_filename'}) if $dom and $dom->can('setBaseURI');
-	    $dom->setURI($ctxt->{'_filename'}) if $dom and $dom->can('setURI');
-	    $reader = XML::LibXML::Reader->new(DOM => $dom);
-	    $reader->nextElement();
-	    last;
-	  } elsif ($type eq 'pipe' or $type eq 'shell') {
-	    my $code = $in_xsl->get_member('command');
-	    next unless $code;
-	    _debug("Transforming to PML with $type code: $code");
-	    $ctxt->{'_transform_id'} = $id;
-	    my $params = $in_xsl->content;
-	    my @params;
-	    @params = grep {defined and length } map { $_->{'name'} => $_->value } $params->values if $params;
-	    my $tmp_file_in;
-	    if ($type eq 'pipe') {
-	      (my $fh, $tmp_file_in) = File::Temp::tempfile();
-	      $dom->toFH($fh);
-	      close $fh;
-	    } else {
-	      push @params, $dom->URI;
-	    }
-	    my $tmp_file_out;
-	    {
-	      local *OLDIN;
-	      local *OLDOUT;
-	      open OLDOUT,"<&STDOUT";
-	      open OLDIN,"<&STDIN";
+          } elsif ($type eq 'perl') {
+            my $code = $in_xsl->get_member('command');
+            next unless $code;
+            _debug("Transforming to PML with Perl code: $code");
+            $ctxt->{'_transform_id'} = $id;
+            my $params = $in_xsl->content;
+            my %params;
+            %params = map { $_->{'name'} => $_->value } $params->values if $params;
+            $dom = perl_transform($code, $dom, %params);
+            die("Perl-based transformation '$id' failed: $@") if $@;
+            die("Perl-based transformation didn't return a XML::LibXML::Document object!\n") unless
+              (blessed($dom) and $dom->isa('XML::LibXML::Document'));
+            $dom->setBaseURI($ctxt->{'_filename'}) if $dom and $dom->can('setBaseURI');
+            $dom->setURI($ctxt->{'_filename'}) if $dom and $dom->can('setURI');
+            $reader = XML::LibXML::Reader->new(DOM => $dom);
+            $reader->nextElement();
+            last;
+          } elsif ($type eq 'pipe' or $type eq 'shell') {
+            my $code = $in_xsl->get_member('command');
+            next unless $code;
+            _debug("Transforming to PML with $type code: $code");
+            $ctxt->{'_transform_id'} = $id;
+            my $params = $in_xsl->content;
+            my @params;
+            @params = grep {defined and length } map { $_->{'name'} => $_->value } $params->values if $params;
+            my $tmp_file_in;
+            if ($type eq 'pipe') {
+              (my $fh, $tmp_file_in) = File::Temp::tempfile();
+              $dom->toFH($fh);
+              close $fh;
+            } else {
+              push @params, $dom->URI;
+            }
+            my $tmp_file_out;
+            {
+              local *OLDIN;
+              local *OLDOUT;
+              open OLDOUT,"<&STDOUT";
+              open OLDIN,"<&STDIN";
 
-	      if ($type eq 'pipe') {
-		open STDIN, '<', $tmp_file_in;
-	      } else {
-		close STDIN;
-	      }
-	      (undef, $tmp_file_out) = File::Temp::tempfile();
-	      open STDOUT, '>', $tmp_file_out;
-	      system($code,@params);
-	      unlink $tmp_file_in if $tmp_file_in;
-	      open STDIN,"<&OLDIN";
-	      open STDOUT,">&OLDOUT";
-	    }
-	    {
-	      open(my $fh, '<', $tmp_file_out) or die("Failed to read output from pipe transformation: $code\n");
-	      unlink $tmp_file_out if $tmp_file_out;
-	      $reader = XML::LibXML::Reader->new(IO => $fh, URI => $ctxt->{'_filename'});
-	    }
-	    $reader->nextElement();
-	    last;
-	  }
-	} else {
-	  _debug("failed");
-	}
+              if ($type eq 'pipe') {
+                open STDIN, '<', $tmp_file_in;
+              } else {
+                close STDIN;
+              }
+              (undef, $tmp_file_out) = File::Temp::tempfile();
+              open STDOUT, '>', $tmp_file_out;
+              system($code,@params);
+              unlink $tmp_file_in if $tmp_file_in;
+              open STDIN,"<&OLDIN";
+              open STDOUT,">&OLDOUT";
+            }
+            {
+              open(my $fh, '<', $tmp_file_out) or die("Failed to read output from pipe transformation: $code\n");
+              unlink $tmp_file_out if $tmp_file_out;
+              $reader = XML::LibXML::Reader->new(IO => $fh, URI => $ctxt->{'_filename'});
+            }
+            $reader->nextElement();
+            last;
+          }
+        } else {
+          _debug("failed");
+        }
       }
     }
     if (($reader->namespaceURI||'') ne PML_NS) {
@@ -365,9 +365,9 @@ sub load {
     # preprocess the options selected_references and selected_keys:
     # we map the reffile names to reffile id's
     my $sel_knit = ($ctxt->{_selected_knits} =
-		      $opts->{selected_knits});
+                      $opts->{selected_knits});
     my $sel_refs = ($ctxt->{_selected_references} =
-		      $opts->{selected_references});
+                      $opts->{selected_references});
     croak("Treex::PML::Instance->load: selected_knits must be a Hash ref!")
       if defined($sel_knit) && ref($sel_knit) ne 'HASH';
     croak("Treex::PML::Instance->load: selected_references must be a Hash ref!")
@@ -376,14 +376,14 @@ sub load {
      $ctxt->{'_selected_references_ids'}) = map {
        my $sel = $_;
        my $ret = {
-	 (defined($sel) ?
-	   (map {
-	     my $ids = $ctxt->{'_refnames'}->{$_};
-	     my $val = $sel->{$_};
-	     map { $_=>$val } 
-	       defined($ids) ? (ref($ids) ? @$ids : ($ids)) : ()
-	   } keys %$sel) : ())
-	};
+         (defined($sel) ?
+           (map {
+             my $ids = $ctxt->{'_refnames'}->{$_};
+             my $val = $sel->{$_};
+             map { $_=>$val } 
+               defined($ids) ? (ref($ids) ? @$ids : ($ids)) : ()
+           } keys %$sel) : ())
+        };
        $ret
      } ($sel_knit,$sel_refs);
   }
@@ -431,9 +431,9 @@ sub read_header {
 
   # manually extract the root node
   my $root = [XML_READER_TYPE_ELEMENT,
-	      $reader->localName,
-	      undef,
-	     ];
+              $reader->localName,
+              undef,
+             ];
   # read root node attributes
   $root->[XAT_LINE] = 0;
   $root->[XAT_ATTRS] = readAttributes($reader);
@@ -444,11 +444,11 @@ sub read_header {
       die "Unexpected content of a root element preceding <head>"._reader_address($ctxt,$reader);
     } elsif ($type == XML_READER_TYPE_ELEMENT) {
       if ($reader->localName eq 'head' and $reader->namespaceURI eq PML_NS) {
-	# we have head!
-	$found_head = 1;
-	last;
+        # we have head!
+        $found_head = 1;
+        last;
       } else {
-	die "Unexpected element '".$reader->name."' precedes PML header <head>"._reader_address($ctxt,$reader);
+        die "Unexpected element '".$reader->name."' precedes PML header <head>"._reader_address($ctxt,$reader);
       }
     }
   }
@@ -463,78 +463,78 @@ sub read_header {
     if ($type == XML_READER_TYPE_ELEMENT and $reader->namespaceURI eq PML_NS) {
       my $name = $reader->localName;
       if ($name eq 'schema') {
-	if ($ctxt->{'_schema'}) {
-	  warn "Multiple <schema> elements in a PML <head>!";
-	  $reader->nextSibling || last;
-	  redo;
-	}
-	# read schema here:
-	my %a = @{ readAttributes($reader) || [] };
-	my $schema_file = delete $a{href};
-	if (defined $schema_file and length $schema_file) {
-	  $schema_file = URI->new(Encode::encode_utf8($schema_file));
-	  # print "$schema_file\n";
-	  $ctxt->{'_schema-url'} = $schema_file; # store the original URL, not the resolved one!
-	  my $schema_path = Treex::PML::ResolvePath($ctxt->{'_filename'},$schema_file,1);
-	  my $key = _get_schema_cache_key($schema_path);
-	  if (!($ctxt->{'_schema'}=get_cached_schema($key))) {
-	    # print "loading schema $schema_path\n";
-	    $ctxt->{'_schema'} =
-	      Treex::PML::Factory->createPMLSchema({
-		filename => $schema_path,
-		use_resources => 1,
-		revision_error => 
-		  "Error: ".$ctxt->{'_filename'}." requires different revision of PML schema %f: %e\n",
-		%a, # revision_opts
-	      });
-	    cache_schema($key, $ctxt->{'_schema'}) if $CACHE_SCHEMAS;
-	  }
-	} else {
-	  # inline schema
-	  $ctxt->{'_schema'} = Treex::PML::Factory->createPMLSchema({
-	    reader=>$reader,
-	    base_url => $ctxt->{'_filename'},
-	    use_resources => 1,
-	    revision_error => 
-	      "Error: ".($ctxt->{'_filename'}||'document')." requires different revision of PML schema %f: %e\n",
-	    %a, # revision_opts
-	  });
-	}
+        if ($ctxt->{'_schema'}) {
+          warn "Multiple <schema> elements in a PML <head>!";
+          $reader->nextSibling || last;
+          redo;
+        }
+        # read schema here:
+        my %a = @{ readAttributes($reader) || [] };
+        my $schema_file = delete $a{href};
+        if (defined $schema_file and length $schema_file) {
+          $schema_file = URI->new(Encode::encode_utf8($schema_file));
+          # print "$schema_file\n";
+          $ctxt->{'_schema-url'} = $schema_file; # store the original URL, not the resolved one!
+          my $schema_path = Treex::PML::ResolvePath($ctxt->{'_filename'},$schema_file,1);
+          my $key = _get_schema_cache_key($schema_path);
+          if (!($ctxt->{'_schema'}=get_cached_schema($key))) {
+            # print "loading schema $schema_path\n";
+            $ctxt->{'_schema'} =
+              Treex::PML::Factory->createPMLSchema({
+                filename => $schema_path,
+                use_resources => 1,
+                revision_error => 
+                  "Error: ".$ctxt->{'_filename'}." requires different revision of PML schema %f: %e\n",
+                %a, # revision_opts
+              });
+            cache_schema($key, $ctxt->{'_schema'}) if $CACHE_SCHEMAS;
+          }
+        } else {
+          # inline schema
+          $ctxt->{'_schema'} = Treex::PML::Factory->createPMLSchema({
+            reader=>$reader,
+            base_url => $ctxt->{'_filename'},
+            use_resources => 1,
+            revision_error => 
+              "Error: ".($ctxt->{'_filename'}||'document')." requires different revision of PML schema %f: %e\n",
+            %a, # revision_opts
+          });
+        }
       } elsif ($name eq 'references') {
-	if ($reader->read) {
-	  while ($reader->depth==3) {
-	    if ($reader->localName eq 'reffile' and
-		  $reader->namespaceURI eq PML_NS) {
-	      my %a = @{ readAttributes($reader) || [] };
-	      my ($id,$name,$href) = @a{qw(id name href)};
-	      if (defined($id) and length($id) and
-		    defined($href) and length($href)) {
-		if (defined $name and length $name) {
-		  my $prev_ids = $named_references{ $name };
-		  if (defined $prev_ids) {
-		    if (ref($prev_ids)) {
-		      push @$prev_ids,$id;
-		    } else {
-		      $named_references{ $name }=Treex::PML::Factory->createAlt([$prev_ids,$id],1);
-		    }
-		  } else {
-		    $named_references{ $name } = $id;
-		  }
-		}
-		# Encode: all filenames must(!) be bytes
-		$references{$id} = Treex::PML::ResolvePath
+        if ($reader->read) {
+          while ($reader->depth==3) {
+            if ($reader->localName eq 'reffile' and
+                  $reader->namespaceURI eq PML_NS) {
+              my %a = @{ readAttributes($reader) || [] };
+              my ($id,$name,$href) = @a{qw(id name href)};
+              if (defined($id) and length($id) and
+                    defined($href) and length($href)) {
+                if (defined $name and length $name) {
+                  my $prev_ids = $named_references{ $name };
+                  if (defined $prev_ids) {
+                    if (ref($prev_ids)) {
+                      push @$prev_ids,$id;
+                    } else {
+                      $named_references{ $name }=Treex::PML::Factory->createAlt([$prev_ids,$id],1);
+                    }
+                  } else {
+                    $named_references{ $name } = $id;
+                  }
+                }
+                # Encode: all filenames must(!) be bytes
+                $references{$id} = Treex::PML::ResolvePath
                   ($ctxt->{'_filename'},
                    URI->new(Encode::encode_utf8($href)),
                    $opts->{use_resources});
                 # Resources are not used for non-readas references,
                 # though, they must be handled manually.
-	      } else {
-		warn "Missing id or href attribute on a <reffile>: ignoring\n";
-	      }
-	    }
-	    $reader->nextSibling || last;
-	  }
-	}
+              } else {
+                warn "Missing id or href attribute on a <reffile>: ignoring\n";
+              }
+            }
+            $reader->nextSibling || last;
+          }
+        }
       }
     }
   }
@@ -601,7 +601,7 @@ sub load_data {
   # print Dumper($root);
 
 #   print Dumper({references => $ctxt->{'_references'},
-# 		refnames => $ctxt->{'_refnames'}});
+#                 refnames => $ctxt->{'_refnames'}});
   return $root;
 }
 
@@ -616,22 +616,22 @@ sub _set_trees_seq {
     my $val = $element->[1];
     if (UNIVERSAL::DOES::does($val,'Treex::PML::Node')) {
       if ($phase == 0) {
-	$phase = 1;
+        $phase = 1;
       }
       if ($phase == 1) {
-	$val->{'#name'} = $element->[0]; # manually delegate_name on this element
-	push @$trees, $val;
+        $val->{'#name'} = $element->[0]; # manually delegate_name on this element
+        push @$trees, $val;
       } else {
-	$prolog->push_element_obj($element);
+        $prolog->push_element_obj($element);
       }
     } else {
       if ($phase == 1) {
-	$phase = 2; # start epilog
+        $phase = 2; # start epilog
       }
       if ($phase == 0) {
-	$prolog->push_element_obj($element);
+        $prolog->push_element_obj($element);
       } else {
-	$epilog->push_element_obj($element);
+        $epilog->push_element_obj($element);
       }
     }
   }
@@ -697,10 +697,10 @@ sub _fix_id_member {
       $cdecl->set_format('PMLREF');
     } elsif ($cdecl = $idM->get_content_decl()) {
       if ($cdecl and $cdecl->get_decl_type == PML_CDATA_DECL and $cdecl->get_format eq 'ID') {
-	  warn "Trying to knit object of type '".$decl->get_decl_path."' which has an #ID-attribute ".
-	    "'".$idM->get_name."' declared as <cdata format=\"ID\"/>. ".
-	      "Note that the data-type for #ID-attributes in objects knitted as DOM should be ".
-		"<cdata format=\"PMLREF\"/> (Hint: redeclare with <derive> for imported types).";
+          warn "Trying to knit object of type '".$decl->get_decl_path."' which has an #ID-attribute ".
+            "'".$idM->get_name."' declared as <cdata format=\"ID\"/>. ".
+              "Note that the data-type for #ID-attributes in objects knitted as DOM should be ".
+                "<cdata format=\"PMLREF\"/> (Hint: redeclare with <derive> for imported types).";
       }
     }
   }
@@ -761,14 +761,14 @@ sub knit_code {
   $sub.=q`
                      }
                    } else {
-    	             warn("warning: KNIT failed: document '$file_id' not loaded\n");
+                         warn("warning: KNIT failed: document '$file_id' not loaded\n");
                    }
                  } else {
                    $target = $ID_HASH->{$ID_PREFIX.$ref};
                  }
                  if (ref $target) {`.$assign.q`
                  } else {
-    	           warn("warning: KNIT failed: ID $ref not found in reffile '$file_id'\n");`.$fail.q`
+                       warn("warning: KNIT failed: ID $ref not found in reffile '$file_id'\n");`.$fail.q`
                  }
                }
              }
@@ -813,8 +813,8 @@ sub compile_schema {
     $path =~ s/^!// if $path;
     return if $decl_type == PML_ATTRIBUTE_DECL ||
       $decl_type == PML_MEMBER_DECL    ||
-	$decl_type == PML_TYPE_DECL      ||
-	  $decl_type == PML_ELEMENT_DECL;
+        $decl_type == PML_TYPE_DECL      ||
+          $decl_type == PML_ELEMENT_DECL;
     if ($decl_type == PML_ROOT_DECL) {
       my $name = $decl->get_name;
       my $cpath = $decl->get_content_decl->get_decl_path;
@@ -824,11 +824,11 @@ sub compile_schema {
     sub {
       my ($p)=@_;
       unless (ref($p) and
-	      $p->[XAT_TYPE] == XML_READER_TYPE_ELEMENT and
-	      $p->[XAT_NS] == $pml_ns_index and
-	      $p->[XAT_NAME] eq '`.$name.q`'
-	     ) {
-	die q(Did not find expected root element '`.$name.q` in ').$pml_file;
+              $p->[XAT_TYPE] == XML_READER_TYPE_ELEMENT and
+              $p->[XAT_NS] == $pml_ns_index and
+              $p->[XAT_NAME] eq '`.$name.q`'
+             ) {
+        die q(Did not find expected root element '`.$name.q` in ').$pml_file;
       }
       return ($handlers{ '`.$cpath.q`' })->($p);
     }`;
@@ -846,7 +846,7 @@ sub compile_schema {
          # print join(",",map {defined($_) ? $_ : 'undef'} $p->[XAT_NAME],$p->[XAT_LINE],@$p)."\n";
          my (%s,$k,$v);`;
       if ($VALIDATE_CDATA) {
-	$sub .= q`
+        $sub .= q`
          if ($a) {
            while (@$a) {
              $k=shift @$a;
@@ -855,7 +855,7 @@ sub compile_schema {
            }
          }`;
       } else {
-	$sub .= q`
+        $sub .= q`
          %s = @$a if $a;`;
       }
       $sub .= q`
@@ -876,41 +876,41 @@ sub compile_schema {
          }`;
       my ($id, $children_member);
       for my $member ($decl->get_members) {
-	my $mdecl = $member->get_content_decl;
-	if ($member->is_required) {
-	  my $name = $member->get_name;
-	  if ($mdecl && $mdecl->get_role eq '#TREES') {
-	    # this is a bit of a hack:
-	    # in this case, if the trees have been read from the member, the member handler returns
-	    # a stub value '#TREES' that will get deleted
-	    $sub.=q`
-	    ref or ($_ eq '#TREES' and delete($s{'`.$name.q`'})) or warn q(Missing required member '`.$name.q`' in structure '`.$path.q`' at ).$pml_file.' line '.$p->[XAT_LINE] for $s{'`.$name.q`'};`;
-	  } else {
-	    $sub.=q`
+        my $mdecl = $member->get_content_decl;
+        if ($member->is_required) {
+          my $name = $member->get_name;
+          if ($mdecl && $mdecl->get_role eq '#TREES') {
+            # this is a bit of a hack:
+            # in this case, if the trees have been read from the member, the member handler returns
+            # a stub value '#TREES' that will get deleted
+            $sub.=q`
+            ref or ($_ eq '#TREES' and delete($s{'`.$name.q`'})) or warn q(Missing required member '`.$name.q`' in structure '`.$path.q`' at ).$pml_file.' line '.$p->[XAT_LINE] for $s{'`.$name.q`'};`;
+          } else {
+            $sub.=q`
          ref or defined and length or warn q(Missing required member '`.$name.q`' in structure '`.$path.q`' at ).$pml_file.' line '.$p->[XAT_LINE] for $s{'`.$name.q`'};`;
-	  }
-	} elsif ($mdecl and $mdecl->get_decl_type == PML_CONSTANT_DECL) {
-	  $sub.=q`
+          }
+        } elsif ($mdecl and $mdecl->get_decl_type == PML_CONSTANT_DECL) {
+          $sub.=q`
          defined or $_="`.quotemeta($mdecl->{value}).q`" for $s{'`.$member->get_name.q`'};`;
-	}
-	my $role = $member->get_role;
-	if ($KNIT and !$role) {
-	  $mdecl ||= $member->get_content_decl;
-	  if ($mdecl and $mdecl->get_decl_type == PML_LIST_DECL and
-	      $mdecl->get_role eq '#KNIT') {
-	    my $mname = $member->get_name;
-	    my $knit_name = $mname; $knit_name=~s/\.rf$//;
-#	    warn("#KNIT on list not yet implemented: ".$member->get_name."\n");
-	    $sub .=q`
+        }
+        my $role = $member->get_role;
+        if ($KNIT and !$role) {
+          $mdecl ||= $member->get_content_decl;
+          if ($mdecl and $mdecl->get_decl_type == PML_LIST_DECL and
+              $mdecl->get_role eq '#KNIT') {
+            my $mname = $member->get_name;
+            my $knit_name = $mname; $knit_name=~s/\.rf$//;
+#            warn("#KNIT on list not yet implemented: ".$member->get_name."\n");
+            $sub .=q`
           my $ref_list = $s{'`.$mname.q`'};
           if ($ref_list) {
             my (@knit_list,@weaken,$weaken);
              for my $ref (@$ref_list) {
                $weaken=1;`
-	    .knit_code($mdecl->get_knit_content_decl(),q`
+            .knit_code($mdecl->get_knit_content_decl(),q`
                    push @knit_list, $target;
                    push @weaken, $weaken;`,
-		  q`undef $ref_list; last;`)
+                  q`undef $ref_list; last;`)
             .q`
             }
             if (defined $ref_list) {
@@ -919,60 +919,60 @@ sub compile_schema {
                 weaken($_) if $weaken[$i++];
               }
               $s{'`.$knit_name.q`'}=Treex::PML::Factory->createList(\@knit_list);`;
-	    if ($mname ne $knit_name) {
-	      $sub .= q`delete $s{'`.$mname.q`'};`;
-	    }
-	    $sub .= q`
+            if ($mname ne $knit_name) {
+              $sub .= q`delete $s{'`.$mname.q`'};`;
+            }
+            $sub .= q`
             } else {
               warn("KNIT failed on list '`.$mname.q`'");
             }
           }`;
-	  next;
-	  }
-	}
-	if ($role eq '#ID') {
-	  $id = $member->get_name;
-	} elsif (!$trees_type and $role eq '#TREES' and $BUILD_TREES) {
-	  $mdecl ||= $member->get_content_decl;
-	  my $mtype = $mdecl->get_decl_type;
-	  if ($mtype == PML_LIST_DECL) {
-	    # check that content type is of role #NODE
-	    my $cmdecl = $mdecl->get_content_decl;
-	    my $cmdecl_type = $cmdecl->get_decl_type;
-	    unless ($cmdecl && ($cmdecl->get_role||'') eq '#NODE' &&
-		      ($cmdecl_type == PML_STRUCTURE_DECL or
-			 $cmdecl_type == PML_CONTAINER_DECL)) {
-	      _report_error("List '$path' with role #TREES may only contain structures or containers with role #NODE in schema ".
-		$decl->get_schema->get_url."\n");
-	    }
-	    $trees_type = $mdecl;
-	    $sub .= q`
+          next;
+          }
+        }
+        if ($role eq '#ID') {
+          $id = $member->get_name;
+        } elsif (!$trees_type and $role eq '#TREES' and $BUILD_TREES) {
+          $mdecl ||= $member->get_content_decl;
+          my $mtype = $mdecl->get_decl_type;
+          if ($mtype == PML_LIST_DECL) {
+            # check that content type is of role #NODE
+            my $cmdecl = $mdecl->get_content_decl;
+            my $cmdecl_type = $cmdecl->get_decl_type;
+            unless ($cmdecl && ($cmdecl->get_role||'') eq '#NODE' &&
+                      ($cmdecl_type == PML_STRUCTURE_DECL or
+                         $cmdecl_type == PML_CONTAINER_DECL)) {
+              _report_error("List '$path' with role #TREES may only contain structures or containers with role #NODE in schema ".
+                $decl->get_schema->get_url."\n");
+            }
+            $trees_type = $mdecl;
+            $sub .= q`
           unless ($have_trees) {
             $ctxt->{'_pml_trees_type'} = $trees_type;
             $have_trees=1;
             $ctxt->{'_trees'} = delete $s{'`.$member->get_name.q`'};
           }`;
-	  } elsif ($mtype == PML_SEQUENCE_DECL) {
-	    $trees_type = $mdecl;
-	    $sub .= q`
+          } elsif ($mtype == PML_SEQUENCE_DECL) {
+            $trees_type = $mdecl;
+            $sub .= q`
              unless ($have_trees) {
                $have_trees=1;
                defined($_) && _set_trees_seq($ctxt,$trees_type,$_->elements_list) for (delete $s{'`.$member->get_name.q`'});
              }`;
-	  } else {
-	    _report_error("#TREES member '$path/".$member->get_name."' is neither a list nor a sequence in schema ".$member->get_schema->get_url."\n");
-	  }
-	} elsif ($role eq '#CHILDNODES') {
-	  if ($children_member) {
-	    _report_error("#CHILDNODES role defined on multiple members of type '$path': '$children_member' and '".$member->get_name."' in schema ".$member->get_schema->get_url."\n");
-	  } else {
-	    $children_member=$member->get_name;
-	  }
-	} elsif ($role eq '#KNIT' and $KNIT) {
-	  my $mname = $member->get_name;
-	  my $knit_name = $mname; $knit_name=~s/\.rf$//;
-	  $sub .= q`
-	    my $ref = $s{'`.$mname.q`'}; my $weaken = 1;`
+          } else {
+            _report_error("#TREES member '$path/".$member->get_name."' is neither a list nor a sequence in schema ".$member->get_schema->get_url."\n");
+          }
+        } elsif ($role eq '#CHILDNODES') {
+          if ($children_member) {
+            _report_error("#CHILDNODES role defined on multiple members of type '$path': '$children_member' and '".$member->get_name."' in schema ".$member->get_schema->get_url."\n");
+          } else {
+            $children_member=$member->get_name;
+          }
+        } elsif ($role eq '#KNIT' and $KNIT) {
+          my $mname = $member->get_name;
+          my $knit_name = $mname; $knit_name=~s/\.rf$//;
+          $sub .= q`
+            my $ref = $s{'`.$mname.q`'}; my $weaken = 1;`
           .knit_code($member->get_knit_content_decl,q`
                    if ($weaken) {
                      weaken( $s{'`.$knit_name.q`'}=$target );
@@ -980,78 +980,78 @@ sub compile_schema {
                      $s{'`.$knit_name.q`'}=$target;
                    } `.
                    ($mname ne $knit_name ? q`delete $s{'`.$mname.q`'};` : ''), '');
-	}
+        }
       }
       if ($decl->get_role eq '#NODE' and $BUILD_TREES) {
-	$sub .= q`
+        $sub .= q`
          my $node = Treex::PML::Factory->createTypedNode($decl,\%s,1);
          # my $node = bless \%s, 'Treex::PML::Node';
          # $node->{`.$Treex::PML::Node::TYPE.q`}=$decl;`;
-	if ($children_member) {
-	  my $cdecl = $decl->get_member_by_name($children_member)->get_content_decl;
-	  my $ctype = $cdecl->get_decl_type;
-	  if ($ctype == PML_LIST_DECL) {
-	    my $cmdecl = $cdecl->get_content_decl;
-	    my $cmdecl_type = $cmdecl->get_decl_type;
-	    unless ($cmdecl->get_role eq '#NODE' &&
-		      ($cmdecl_type == PML_STRUCTURE_DECL or
-			 $cmdecl_type == PML_CONTAINER_DECL)) {
-	      _report_error("List '$path' with role #CHILDNODES may only contain structures or containers with role #NODE in schema '".
-		$decl->get_schema->get_url."'; got ".$cmdecl->get_decl_type_str." (".$cmdecl->get_decl_path.") with role '".$cmdecl->get_role."' instead!\n");
-	    }
-	    $sub .= q`
+        if ($children_member) {
+          my $cdecl = $decl->get_member_by_name($children_member)->get_content_decl;
+          my $ctype = $cdecl->get_decl_type;
+          if ($ctype == PML_LIST_DECL) {
+            my $cmdecl = $cdecl->get_content_decl;
+            my $cmdecl_type = $cmdecl->get_decl_type;
+            unless ($cmdecl->get_role eq '#NODE' &&
+                      ($cmdecl_type == PML_STRUCTURE_DECL or
+                         $cmdecl_type == PML_CONTAINER_DECL)) {
+              _report_error("List '$path' with role #CHILDNODES may only contain structures or containers with role #NODE in schema '".
+                $decl->get_schema->get_url."'; got ".$cmdecl->get_decl_type_str." (".$cmdecl->get_decl_path.") with role '".$cmdecl->get_role."' instead!\n");
+            }
+            $sub .= q`
             my $content = delete $node->{'`.$children_member.q`'};
-	    if ($content) {
+            if ($content) {
               my $prev;
               foreach my $son (@{ $content }) {
                 if ($prev) {
-		  `._paste_last_code(qw($son $prev $node)).q`
-		} else {
-		  `._paste_first_code(qw($son $node)).q`
-		}
-		$prev = $son;
-	      }
+                  `._paste_last_code(qw($son $prev $node)).q`
+                } else {
+                  `._paste_first_code(qw($son $node)).q`
+                }
+                $prev = $son;
+              }
             }`;
-	  } elsif ($ctype == PML_SEQUENCE_DECL) {
-	    for my $edecl ($cdecl->get_elements) {
-	      my $cmdecl = $edecl->get_content_decl;
-	      my $cmdecl_type = $cmdecl->get_decl_type;
-	      unless ($cmdecl->get_role eq '#NODE' &&
-			($cmdecl_type == PML_STRUCTURE_DECL or
-			   $cmdecl_type == PML_CONTAINER_DECL)) {
-		_report_error("Sequence '$path' with role #CHILDNODES may only contain structures or containers with role #NODE in schema '".
-		  $decl->get_schema->get_url."'; got ".$cmdecl->get_decl_type_str." (".$cmdecl->get_decl_path.") with role '".$cmdecl->get_role."' instead!\n");
-	      }
-	    }
-	    $sub .= q`
+          } elsif ($ctype == PML_SEQUENCE_DECL) {
+            for my $edecl ($cdecl->get_elements) {
+              my $cmdecl = $edecl->get_content_decl;
+              my $cmdecl_type = $cmdecl->get_decl_type;
+              unless ($cmdecl->get_role eq '#NODE' &&
+                        ($cmdecl_type == PML_STRUCTURE_DECL or
+                           $cmdecl_type == PML_CONTAINER_DECL)) {
+                _report_error("Sequence '$path' with role #CHILDNODES may only contain structures or containers with role #NODE in schema '".
+                  $decl->get_schema->get_url."'; got ".$cmdecl->get_decl_type_str." (".$cmdecl->get_decl_path.") with role '".$cmdecl->get_role."' instead!\n");
+              }
+            }
+            $sub .= q`
             my $content = delete $node->{'`.$children_member.q`'};
-	    if ($content) {
+            if ($content) {
               # $content->delegate_names('#name');
               foreach my $element (@{$content->[0]}) { # manually delegate
                 $element->[1]{'#name'} = $element->[0]; # store element's name in key $key of its value
               }
-	      my $prev;
+              my $prev;
               foreach my $son (map $_->[1], @{$content->[0]}) { # $content->values
                 if ($prev) {
-		  `._paste_last_code(qw($son $prev $node)).q`
-		} else {
-		  `._paste_first_code(qw($son $node)).q`
-		}
-		$prev = $son;
-	      }
+                  `._paste_last_code(qw($son $prev $node)).q`
+                } else {
+                  `._paste_first_code(qw($son $node)).q`
+                }
+                $prev = $son;
+              }
             }`;
-	  } else {
-	    _report_error("Role #CHILDNODES can only occur on a structure member of type list or sequence, not on ".$cdecl->get_decl_type_str." '$path' in schema ".$cdecl->get_schema->get_url."\n");
-	  }
-	}
+          } else {
+            _report_error("Role #CHILDNODES can only occur on a structure member of type list or sequence, not on ".$cdecl->get_decl_type_str." '$path' in schema ".$cdecl->get_schema->get_url."\n");
+          }
+        }
       } else {
-	$sub.=q`
+        $sub.=q`
          my $node = Treex::PML::Factory->createStructure(\%s,1);
          # my $node = bless \%s, 'Treex::PML::Struct';
        `;
       }
       if (defined $id) {
-	$sub.=hash_id_code(qq(\$s{'$id'}),'$node');
+        $sub.=hash_id_code(qq(\$s{'$id'}),'$node');
       }
       $sub.=q`
          return $node;
@@ -1079,10 +1079,10 @@ sub compile_schema {
              $v=shift @$a;
              if (exists $attributes{$k}) {`;
       if ($VALIDATE_CDATA) {
-	$sub .= q`
+        $sub .= q`
                $s{ $k } = ($handlers{ '`.$path.q`/'.$k }||_unhandled("attribute '$k'",$pml_file,$p,'`.$path.q`'))->( $v );`;
       } else {
-	$sub .= q`
+        $sub .= q`
                $s{ $k } = $v;`;
       }
       $sub .= q`
@@ -1093,94 +1093,94 @@ sub compile_schema {
          }
          $p->[XAT_ATTRS]=\@a_rest;`;
       if ($cdecl) {
-	$sub .= q`
+        $sub .= q`
          $content = $handlers{ '`.$cpath.q`' }->($p);`;
       } else {
-	$sub .= q`
+        $sub .= q`
          !$c or !grep { !($_->[XAT_TYPE] == XML_READER_TYPE_WHITESPACE or $_->[XAT_TYPE] == XML_READER_TYPE_SIGNIFICANT_WHITESPACE) } @$c or _report_error(qq(Unexpected content of an empty container type '`.$path.q`' at ).$pml_file.' line '.$p->[XAT_LINE]);`;
       }
       my $id;
       for my $member ($decl->get_attributes) {
-	if ($member->is_required) {
-	  my $name = $member->get_name;
-	  $sub.=q`
+        if ($member->is_required) {
+          my $name = $member->get_name;
+          $sub.=q`
          ref or defined and length or _report_error(q(missing required attribute '`.$name.q`' in container '`.$path.q`' at ).$pml_file.' line '.$p->[XAT_LINE]) for $s{'`.$name.q`'};`;
-	}
-	if ($member->get_role eq '#ID') {
-	  $id = $member->get_name;
-	}
+        }
+        if ($member->get_role eq '#ID') {
+          $id = $member->get_name;
+        }
       }
       if ($decl->get_role eq '#NODE' and $BUILD_TREES) {
-	$sub .= q`
+        $sub .= q`
          my $node = Treex::PML::Factory->createTypedNode($decl,\%s,1);
          # my $node = bless \%s, 'FSNode';
          # $node->{`.$Treex::PML::Node::TYPE.q`}=$decl;`;
-	if ($cdecl and ($cdecl->get_role||'') eq '#CHILDNODES') {
-	  my $ctype = $cdecl->get_decl_type;
-	  if ($ctype == PML_LIST_DECL) {
-	    my $cmdecl = $cdecl->get_content_decl;
-	    my $cmdecl_type = $cmdecl->get_decl_type;
-	    unless ($cmdecl->get_role eq '#NODE' &&
-		      ($cmdecl_type == PML_STRUCTURE_DECL or
-			 $cmdecl_type == PML_CONTAINER_DECL)) {
-	      _report_error("List '$path' with role #CHILDNODES may only contain structures or containers with role #NODE in schema '".
-		$decl->get_schema->get_url."'; got ".$cmdecl->get_decl_type_str." (".$cmdecl->get_decl_path.") with role '".$cmdecl->get_role."' instead!\n");
-	    }
-	    $sub .= q`
-	    if ($content) {
+        if ($cdecl and ($cdecl->get_role||'') eq '#CHILDNODES') {
+          my $ctype = $cdecl->get_decl_type;
+          if ($ctype == PML_LIST_DECL) {
+            my $cmdecl = $cdecl->get_content_decl;
+            my $cmdecl_type = $cmdecl->get_decl_type;
+            unless ($cmdecl->get_role eq '#NODE' &&
+                      ($cmdecl_type == PML_STRUCTURE_DECL or
+                         $cmdecl_type == PML_CONTAINER_DECL)) {
+              _report_error("List '$path' with role #CHILDNODES may only contain structures or containers with role #NODE in schema '".
+                $decl->get_schema->get_url."'; got ".$cmdecl->get_decl_type_str." (".$cmdecl->get_decl_path.") with role '".$cmdecl->get_role."' instead!\n");
+            }
+            $sub .= q`
+            if ($content) {
               my $prev;
               foreach my $son (@{ $content }) {
                 if ($prev) {
-		  `._paste_last_code(qw($son $prev $node)).q`
-		} else {
-		  `._paste_first_code(qw($son $node)).q`
-		}
-		$prev = $son;
-	      }
+                  `._paste_last_code(qw($son $prev $node)).q`
+                } else {
+                  `._paste_first_code(qw($son $node)).q`
+                }
+                $prev = $son;
+              }
             }`;
-	  } elsif ($ctype == PML_SEQUENCE_DECL) {
-	    for my $edecl ($cdecl->get_elements) {
-	      my $cmdecl = $edecl->get_content_decl or
-		_report_error("Element '".$edecl->get_name."' of sequence '$path' has no content type declaration");
-	      my $cmdecl_type = $cmdecl->get_decl_type;
-	      unless ($cmdecl->get_role eq '#NODE' &&
-			($cmdecl_type == PML_STRUCTURE_DECL or
-			   $cmdecl_type == PML_CONTAINER_DECL)) {
-	      _report_error("Sequence '$path' with role #CHILDNODES may only contain structures or containers with role #NODE in schema '".
-		$decl->get_schema->get_url."'; got ".$cmdecl->get_decl_type_str." (".$cmdecl->get_decl_path.") with role '".$cmdecl->get_role."' instead!\n");
-	      }
-	    }
-	    $sub .= q`
-	    if ($content) {
+          } elsif ($ctype == PML_SEQUENCE_DECL) {
+            for my $edecl ($cdecl->get_elements) {
+              my $cmdecl = $edecl->get_content_decl or
+                _report_error("Element '".$edecl->get_name."' of sequence '$path' has no content type declaration");
+              my $cmdecl_type = $cmdecl->get_decl_type;
+              unless ($cmdecl->get_role eq '#NODE' &&
+                        ($cmdecl_type == PML_STRUCTURE_DECL or
+                           $cmdecl_type == PML_CONTAINER_DECL)) {
+              _report_error("Sequence '$path' with role #CHILDNODES may only contain structures or containers with role #NODE in schema '".
+                $decl->get_schema->get_url."'; got ".$cmdecl->get_decl_type_str." (".$cmdecl->get_decl_path.") with role '".$cmdecl->get_role."' instead!\n");
+              }
+            }
+            $sub .= q`
+            if ($content) {
               # $content->delegate_names('#name');
               foreach my $element (@{$content->[0]}) { # manually delegate
                 $element->[1]{'#name'} = $element->[0]; # store element's name in key $key of its value
               }
-	      my $prev;
+              my $prev;
               foreach my $son (map $_->[1], @{$content->[0]}) { # $content->values
                 if ($prev) {
-		  `._paste_last_code(qw($son $prev $node)).q`
-		} else {
-		  `._paste_first_code(qw($son $node)).q`
-		}
-		$prev = $son;
-	      }
+                  `._paste_last_code(qw($son $prev $node)).q`
+                } else {
+                  `._paste_first_code(qw($son $node)).q`
+                }
+                $prev = $son;
+              }
             }`;
-	  } else {
-	    _report_error("Role #CHILDNODES can only occur on a container content type if it is a list or sequence, not on a ".$cdecl->get_decl_type_str." '".$path."' in schema ".$cdecl->get_schema->get_url."\n");
-	  }
-	} elsif ($cdecl) {
-	  $sub .= q`
+          } else {
+            _report_error("Role #CHILDNODES can only occur on a container content type if it is a list or sequence, not on a ".$cdecl->get_decl_type_str." '".$path."' in schema ".$cdecl->get_schema->get_url."\n");
+          }
+        } elsif ($cdecl) {
+          $sub .= q`
          $node->{'#content'} = $content if $content;`;
-	}
+        }
       } else {
-	$sub.=q`
+        $sub.=q`
          my $node = Treex::PML::Factory->createContainer($content,\%s,1);
          # $s{'#content'}=$content if $content;
          # my $node = bless \%s, 'Treex::PML::Container';`;
       }
       if (defined $id) {
-	$sub.=hash_id_code(qq(\$s{'$id'}),'$node');
+        $sub.=hash_id_code(qq(\$s{'$id'}),'$node');
       }
       $sub.=q`
          return $node;
@@ -1205,7 +1205,7 @@ sub compile_schema {
               $k = $el->[XAT_NAME];
               push @seq, bless [$k, ($handlers{ '`.$path.q`/'.$k }||_unhandled("element '$k'",$pml_file,$el,'`.$path.q`'))->($el)], 'Treex::PML::Seq::Element';`;
       if ($decl->is_mixed) {
-	$sub .= q`
+        $sub .= q`
             } elsif (!ref($el)) {`;
       $sub .= q`
               push @seq, bless ['#TEXT',$el], 'Treex::PML::Seq::Element';
@@ -1214,7 +1214,7 @@ sub compile_schema {
               push @seq, bless ['#TEXT',$el->[XAT_VALUE]], 'Treex::PML::Seq::Element';
             }`;
       } else {
-	$sub .= q`
+        $sub .= q`
             } elsif (!ref($el) or $el->[XAT_TYPE] == XML_READER_TYPE_TEXT or $el->[XAT_TYPE] == XML_READER_TYPE_CDATA) {
                _report_error(q(Unexpected text content in a non-mixed sequence '`.$path.q`' at ).$pml_file.' line '.$p->[XAT_LINE]);
             }`;
@@ -1223,27 +1223,27 @@ sub compile_schema {
           }`;
       my $content_pattern = $decl->get_content_pattern;
       if ($VALIDATE_SEQUENCES and $content_pattern) {
-	my $re = Treex::PML::Seq::content_pattern2regexp($content_pattern);
-	$sub .= q`
-	unless (join('',map '<'.$_->[0].'>',@seq) =~ m{^`.$re.q`$}ox) {
-	  warn("Sequence content (".join(",",map $_->[0], @seq).") does not follow the pattern `.quotemeta($content_pattern).q` in ".$pml_file.' line '.$p->[XAT_LINE]);
-	}`;
+        my $re = Treex::PML::Seq::content_pattern2regexp($content_pattern);
+        $sub .= q`
+        unless (join('',map '<'.$_->[0].'>',@seq) =~ m{^`.$re.q`$}ox) {
+          warn("Sequence content (".join(",",map $_->[0], @seq).") does not follow the pattern `.quotemeta($content_pattern).q` in ".$pml_file.' line '.$p->[XAT_LINE]);
+        }`;
       }
       if (!$trees_type and $decl->get_role eq '#TREES' and $BUILD_TREES) {
-	$trees_type = $decl;
-	$sub .= q`
+        $trees_type = $decl;
+        $sub .= q`
         unless ($have_trees) {
           $have_trees=1;
           _set_trees_seq($ctxt,$trees_type,\@seq);
           return;
-	}`;
+        }`;
       }
       if ($content_pattern) {
-	$sub .= q`
+        $sub .= q`
         return Treex::PML::Factory->createSeq(\@seq, "`.quotemeta($content_pattern).q`",1);
       }`;
       } else {
-	$sub .= q`
+        $sub .= q`
         return Treex::PML::Factory->createSeq(\@seq, undef, 1);
       }`;
       }
@@ -1252,7 +1252,7 @@ sub compile_schema {
     } elsif ($decl_type == PML_LIST_DECL) {
       #    print $path."\t@".$decl->get_decl_type_str,"\n";
       my $cdecl = $decl->get_content_decl
-	or croak("Invalid PML Schema: list type without content: ",$decl->get_decl_path);
+        or croak("Invalid PML Schema: list type without content: ",$decl->get_decl_path);
       my $cpath = $cdecl->get_decl_path;
       $cpath=~s/^!//;
       my $src = $schema_name.'__generated_read_list@'.$path;
@@ -1288,25 +1288,25 @@ sub compile_schema {
             }
           }`;
       if (!$trees_type and $decl->get_role eq '#TREES' and $BUILD_TREES) {
-	my $cdecl_type = $cdecl->get_decl_type;
-	unless ($cdecl && ($cdecl->get_role||'') eq '#NODE' &&
-		  ($cdecl_type == PML_STRUCTURE_DECL or
-		     $cdecl_type == PML_CONTAINER_DECL)) {
-	  _report_error("List '$path' with role #TREES may only contain structures or containers with role #NODE in schema ".
-	    $decl->get_schema->get_url."\n");
-	}
-	$trees_type = $decl;
-	$sub .= q`
+        my $cdecl_type = $cdecl->get_decl_type;
+        unless ($cdecl && ($cdecl->get_role||'') eq '#NODE' &&
+                  ($cdecl_type == PML_STRUCTURE_DECL or
+                     $cdecl_type == PML_CONTAINER_DECL)) {
+          _report_error("List '$path' with role #TREES may only contain structures or containers with role #NODE in schema ".
+            $decl->get_schema->get_url."\n");
+        }
+        $trees_type = $decl;
+        $sub .= q`
           unless ($have_trees) {
             $have_trees = 1;
             $ctxt->{'_pml_trees_type'} = $trees_type;
             $ctxt->{'_trees'} = Treex::PML::Factory->createList(\@list,1);
             return;
-	  }`;
+          }`;
       }
       $sub .= q`
           return Treex::PML::Factory->createList(\@list,1);
-	}`;
+        }`;
       # print $sub;
       $src{$src}=$sub;
       $handlers{$path} = eval $sub; die _nl($sub)."\n".$@.' ' if $@;
@@ -1385,28 +1385,28 @@ sub compile_schema {
               } @$c;`;
       my $format_checker;
       if ($VALIDATE_CDATA and $decl->get_format ne 'any') {
-	$sub .=q`
+        $sub .=q`
             } else {
               $text = $p;
             }`;
-	$format_checker = $decl->_get_format_checker();
-	if (defined $format_checker) {
-	  if (ref($format_checker) eq 'CODE') {
-	    $sub .= q`
+        $format_checker = $decl->_get_format_checker();
+        if (defined $format_checker) {
+          if (ref($format_checker) eq 'CODE') {
+            $sub .= q`
             if (defined $text and length $text and !$format_checker->($text)) {`;
-	  } else {
-	    $sub .= q`
+          } else {
+            $sub .= q`
             if (defined $text and length $text and $text !~ $format_checker) {`;
-	  }
-	  $sub .= q`
-	      warn("CDATA value '$text' does not conform to format '`.$decl->get_format.q`' at ".$pml_file.' line '.$p->[XAT_LINE]);
-	    }`;
-	}
-	$sub .= q`
+          }
+          $sub .= q`
+              warn("CDATA value '$text' does not conform to format '`.$decl->get_format.q`' at ".$pml_file.' line '.$p->[XAT_LINE]);
+            }`;
+        }
+        $sub .= q`
             return $text;
           }`;
       } else {
-	$sub .=q`
+        $sub .=q`
               return $text;
             } else {
               return $p;
@@ -1420,9 +1420,9 @@ sub compile_schema {
       #    print $path,"\n";
       my $value_hash = $decl->{value_hash};
       unless ($value_hash) {
-	$value_hash={};
-	@{$value_hash}{@{$decl->{values}}}=();
-	$decl->{value_hash}=$value_hash;
+        $value_hash={};
+        @{$value_hash}{@{$decl->{values}}}=();
+        $decl->{value_hash}=$value_hash;
       }
       my $src = $schema_name.'__generated_read_choice@'.$path;
       $src=~y{/}{@};
@@ -1501,46 +1501,46 @@ sub compile_schema {
       my ($decl)=@_;
       my $decl_type=$decl->get_decl_type;
       if ($decl_type == PML_ATTRIBUTE_DECL ||
-	    $decl_type == PML_MEMBER_DECL ||
-	      $decl_type == PML_ELEMENT_DECL
-	     ) {
-	my $parent = $decl->get_parent_decl;
-	my $path = $parent->get_decl_path . '/'. $decl->get_name;
-	$path =~ s/^!// if $path;
-	my $mdecl;
-	if ($decl_type == PML_MEMBER_DECL and $decl->is_required) {
-	  # a hack that fixes missing content of a required member
-	  # containing a construct with the role #TREES
-	  #
-	  # the modified handler returns string '#TREES' instead
-	  # and the value gets deleted in the structure handler
-	  $mdecl = $decl->get_content_decl;
-	  if ($mdecl->get_role eq '#TREES' and $mdecl==$trees_type) {
-	    my $mpath = $mdecl->get_decl_path;
-	    $mpath =~ s/^!// if $mpath;
-	    my $handler = $handlers{$mpath};
-	    $handlers{$path}=sub {
-	      if (!$have_trees and $BUILD_TREES) {
-		my $ret = &$handler;
-		return '#TREES' if $have_trees and !defined($ret);
-		return $ret;
-	      } else {
-		return &$handler;
-	      }
-	    };
-	    return;
-	  }
-	}
-	#    print "$path\n";
-	if (!exists($handlers{$path})) {
-	  $mdecl ||= $decl->get_content_decl;
-	  my $mpath = $mdecl && $mdecl->get_decl_path;
-	  if ($mpath) {
-	    $mpath =~ s/^!//;
-	    #      print "mapping $path -> $mpath ... $handlers{$mpath}\n";
-	    $handlers{$path} = $handlers{$mpath};
-	  }
-	}
+            $decl_type == PML_MEMBER_DECL ||
+              $decl_type == PML_ELEMENT_DECL
+             ) {
+        my $parent = $decl->get_parent_decl;
+        my $path = $parent->get_decl_path . '/'. $decl->get_name;
+        $path =~ s/^!// if $path;
+        my $mdecl;
+        if ($decl_type == PML_MEMBER_DECL and $decl->is_required) {
+          # a hack that fixes missing content of a required member
+          # containing a construct with the role #TREES
+          #
+          # the modified handler returns string '#TREES' instead
+          # and the value gets deleted in the structure handler
+          $mdecl = $decl->get_content_decl;
+          if ($mdecl->get_role eq '#TREES' and $mdecl==$trees_type) {
+            my $mpath = $mdecl->get_decl_path;
+            $mpath =~ s/^!// if $mpath;
+            my $handler = $handlers{$mpath};
+            $handlers{$path}=sub {
+              if (!$have_trees and $BUILD_TREES) {
+                my $ret = &$handler;
+                return '#TREES' if $have_trees and !defined($ret);
+                return $ret;
+              } else {
+                return &$handler;
+              }
+            };
+            return;
+          }
+        }
+        #    print "$path\n";
+        if (!exists($handlers{$path})) {
+          $mdecl ||= $decl->get_content_decl;
+          my $mpath = $mdecl && $mdecl->get_decl_path;
+          if ($mpath) {
+            $mpath =~ s/^!//;
+            #      print "mapping $path -> $mpath ... $handlers{$mpath}\n";
+            $handlers{$path} = $handlers{$mpath};
+          }
+        }
       }
     });
 }

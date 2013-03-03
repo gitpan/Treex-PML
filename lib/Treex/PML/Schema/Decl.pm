@@ -9,7 +9,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.10'; # version template
+  $VERSION='2.04'; # version template
 }
 no warnings 'uninitialized';
 use Scalar::Util qw( weaken );
@@ -108,12 +108,12 @@ sub get_content_decl {
     if ($schema) {
       my $type = $schema->{type}{ $type_ref };
       if ($no_resolve) {
-	return $type;
+        return $type;
       } elsif ($type) {
-	weaken($self->{-resolved} = $type->get_content_decl);
-	return $self->{-resolved};
+        weaken($self->{-resolved} = $type->get_content_decl);
+        return $self->{-resolved};
       } else {
-	return undef;
+        return undef;
       }
     } else {
       croak "Declaration not associated with a schema";
@@ -169,9 +169,9 @@ sub get_type_ref_decl {
     if ($schema) {
       my $type = $schema->{type}{ $type_ref };
       return $no_resolve ? $type 
-	: $type ? 
-	  ($self->{-resolved} = $type->get_content_decl)
-	  : undef ;
+        : $type ? 
+          ($self->{-resolved} = $type->get_content_decl)
+          : undef ;
     }
   }
   return(undef);
@@ -272,19 +272,19 @@ sub convert_from_hash {
     if (my $members = $sub->{member}) {
       my ($name, $mdecl);
       while (($name, $mdecl) = each %$members) {
-	bless $mdecl, 'Treex::PML::Schema::Member';
-	$mdecl->{'-xml_name'}='member';
-	$mdecl->{'-attributes'}=[qw(name required as_attribute type role)];
-	weaken($mdecl->{-parent}=$sub);
-	weaken($mdecl->{-schema}=$schema);
-	$class->convert_from_hash($mdecl,
-			 $schema,
-			 $path.'/'.$name
-			);
-	if (!$mdecl->{-decl} and $mdecl->{role} eq '#KNIT') {
-#	  warn("Member $decl->{-parent}{-path}/$decl->{-name} with role=\"#KNIT\" must have a content type declaration: assuming <cdata format=\"PMLREF\">!\n");
-	  Treex::PML::Schema::__fix_knit_type($schema,$mdecl);
-	}
+        bless $mdecl, 'Treex::PML::Schema::Member';
+        $mdecl->{'-xml_name'}='member';
+        $mdecl->{'-attributes'}=[qw(name required as_attribute type role)];
+        weaken($mdecl->{-parent}=$sub);
+        weaken($mdecl->{-schema}=$schema);
+        $class->convert_from_hash($mdecl,
+                         $schema,
+                         $path.'/'.$name
+                        );
+        if (!$mdecl->{-decl} and $mdecl->{role} eq '#KNIT') {
+#          warn("Member $decl->{-parent}{-path}/$decl->{-name} with role=\"#KNIT\" must have a content type declaration: assuming <cdata format=\"PMLREF\">!\n");
+          Treex::PML::Schema::__fix_knit_type($schema,$mdecl);
+        }
       }
     }
   } elsif ($sub = $decl->{container}) {
@@ -294,15 +294,15 @@ sub convert_from_hash {
     if (my $members = $sub->{attribute}) {
       my ($name, $mdecl);
       while (($name, $mdecl) = each %$members) {
-	bless $mdecl, 'Treex::PML::Schema::Attribute';
-	$mdecl->{'-xml_name'}='attribute';
-	$mdecl->{'-attributes'}=[qw(name required type role)];
-	weaken($mdecl->{-schema}=$schema);
-	weaken($mdecl->{-parent}=$sub);
-	$class->convert_from_hash($mdecl, 
-			 $schema,
-			 $path.'/'.$name
-			);
+        bless $mdecl, 'Treex::PML::Schema::Attribute';
+        $mdecl->{'-xml_name'}='attribute';
+        $mdecl->{'-attributes'}=[qw(name required type role)];
+        weaken($mdecl->{-schema}=$schema);
+        weaken($mdecl->{-parent}=$sub);
+        $class->convert_from_hash($mdecl, 
+                         $schema,
+                         $path.'/'.$name
+                        );
       }
     }
     $class->convert_from_hash($sub, $schema, $path.'/#content');
@@ -313,15 +313,15 @@ sub convert_from_hash {
     if (my $members = $sub->{element}) {
       my ($name, $mdecl);
       while (($name, $mdecl) = each %$members) {
-	bless $mdecl, 'Treex::PML::Schema::Element';
-	$mdecl->{'-xml_name'}='element';
-	$mdecl->{'-attributes'}=[qw(name type role)];
-	weaken($mdecl->{-schema}=$schema);
-	weaken($mdecl->{-parent}=$sub);
-	$class->convert_from_hash($mdecl, 
-			 $schema,
-			 $path.'/'.$name
-			);
+        bless $mdecl, 'Treex::PML::Schema::Element';
+        $mdecl->{'-xml_name'}='element';
+        $mdecl->{'-attributes'}=[qw(name type role)];
+        weaken($mdecl->{-schema}=$schema);
+        weaken($mdecl->{-parent}=$sub);
+        $class->convert_from_hash($mdecl, 
+                         $schema,
+                         $path.'/'.$name
+                        );
       }
     }
   } elsif ($sub = $decl->{list}) {
@@ -343,18 +343,18 @@ sub convert_from_hash {
     # convert from an ARRAY to a hash
     if (ref($sub) eq 'ARRAY') {
       $sub = $decl->{choice} = bless { values => [
-	                                 map {
-					   ref($_) eq 'HASH' ? $_->{content} : $_
+                                         map {
+                                           ref($_) eq 'HASH' ? $_->{content} : $_
                                          } @$sub
-				       ],
-				     }, 'Treex::PML::Schema::Choice';
+                                       ],
+                                     }, 'Treex::PML::Schema::Choice';
     } elsif (ref($sub)) {
       bless $sub, 'Treex::PML::Schema::Choice';
       if (ref($sub->{value}) eq 'ARRAY') {
-	$sub->{values} = [
-	  map { $_->{content} } @{$sub->{value}}
-	];
-	delete $sub->{value};
+        $sub->{values} = [
+          map { $_->{content} } @{$sub->{value}}
+        ];
+        delete $sub->{value};
       }
     } else {
       croak __PACKAGE__.": Invalid <choice> element in type '$path'?\n";
@@ -418,12 +418,12 @@ sub get_normal_fields {
   if ($decl_is == PML_STRUCTURE_DECL) {
     @members = 
       map { $_->get_knit_name }
-	grep { $_->get_role ne '#CHILDNODES' }
-	  $type->get_members;
+        grep { $_->get_role ne '#CHILDNODES' }
+          $type->get_members;
   } elsif ($decl_is == PML_CONTAINER_DECL) {
     my $cdecl = $type->get_content_decl;
     @members = ($type->get_attribute_names, 
-		($cdecl && $type->get_role ne '#CHILDNODES') ? '#content' : ());
+                ($cdecl && $type->get_role ne '#CHILDNODES') ? '#content' : ());
   }
 }
 
@@ -514,14 +514,14 @@ sub for_each_decl {
   for my $d (qw(member attribute element)) {
     if (ref $self->{$d}) {
       foreach (values %{$self->{$d}}) {
-	$_->for_each_decl($sub);
+        $_->for_each_decl($sub);
       }
       last if $d eq 'attribute'; # there may be content
       return; # otherwise
     }
   }
   for my $d (qw(list alt structure container sequence),
-	     qw(cdata choice constant)) {
+             qw(cdata choice constant)) {
     if (exists $self->{$d}) {
       $self->{$d}->for_each_decl($sub);
       return;

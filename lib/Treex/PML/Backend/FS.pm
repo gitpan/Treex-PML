@@ -13,7 +13,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.10'; # version template
+  $VERSION='2.04'; # version template
 }
 use Treex::PML::IO qw(open_backend close_backend);
 use Treex::PML::Factory;
@@ -109,7 +109,7 @@ sub _fs2members {
     my $short=$parts[0];
     for (my $i=1;$i<@parts;$i++) {
       if ($defs->{$short}) {
-	warn "Can't emulate PML schema: attribute name conflict between $short and $attr: falling back to non-emulation mode\n";
+        warn "Can't emulate PML schema: attribute name conflict between $short and $attr: falling back to non-emulation mode\n";
       }
       $short .= '/'.$parts[$i];
     }
@@ -120,13 +120,13 @@ sub _fs2members {
     # allow ``alt'' values concatenated with |
     if ($fs->isList($attr)) {
       $m->{alt} = {
-	-flat => 1,
-	choice => [ $fs->listValues($attr) ]
+        -flat => 1,
+        choice => [ $fs->listValues($attr) ]
       };
     } else {
       $m->{alt} = {
-	-flat => 1,
-	cdata => { format =>'any' }
+        -flat => 1,
+        cdata => { format =>'any' }
       };
     }
   }
@@ -147,8 +147,8 @@ sub read {
     $members->{'#childnodes'}={
       role => '#CHILDNODES',
       list => {
-	ordered => 1,
-	type => 'fs-node.type',
+        ordered => 1,
+        type => 'fs-node.type',
       },
     };
     my $node_type = {
@@ -159,25 +159,25 @@ sub read {
     my $schema= Treex::PML::Schema->convert_from_hash({
       description => 'PML schema generated from FS header',
       root => { name => 'fs-data',
-		structure => {
-		  member => {
-		    trees => {
-		      -name => 'trees',
-		      role => '#TREES',
-		      required => 1,
-		      list => {
-			ordered => 1,
-			type => 'fs-node.type'
-		       }
-		     }
-		   }
-		 }
-	      },
+                structure => {
+                  member => {
+                    trees => {
+                      -name => 'trees',
+                      role => '#TREES',
+                      required => 1,
+                      list => {
+                        ordered => 1,
+                        type => 'fs-node.type'
+                       }
+                     }
+                   }
+                 }
+              },
       type => {
-	'fs-node.type' => {
-	  -name => 'fs-node.type',
-	  structure => $node_type,
-	}
+        'fs-node.type' => {
+          -name => 'fs-node.type',
+          structure => $node_type,
+        }
       }
     });
     if (defined($node_type->{member})) {
@@ -222,10 +222,10 @@ sub read {
   unless (@patterns) {
     my ($peep)=$fsfile->tail;
     $fsfile->changePatterns( map { "\$\{".$fsfile->FS->atno($_)."\}" } 
-		    ($peep=~/[,\(]([0-9]+)/g));
+                    ($peep=~/[,\(]([0-9]+)/g));
   }
   $fsfile->changeHint(join "\n",
-		    map { /^\/\/Tred:Balloon-Pattern:(.*\S)\s*$/ ? $1 : () } $fsfile->tail);
+                    map { /^\/\/Tred:Balloon-Pattern:(.*\S)\s*$/ ? $1 : () } $fsfile->tail);
   return 1;
 }
 
@@ -243,22 +243,22 @@ sub write {
   }
   $fsfile->FS->writeTo($fileref);
   PrintFSFile($fileref,
-	      $fsfile->FS,
-	      $fsfile->treeList,
-	      ref($fsfile->metaData('schema')) ? 1 : 0
-	     );
+              $fsfile->FS,
+              $fsfile->treeList,
+              ref($fsfile->metaData('schema')) ? 1 : 0
+             );
 
   ## Tredish custom attributes:
   $fsfile->changeTail(
-		    (grep { $_!~/\/\/Tred:(?:Custom-Attribute(?:Cont)?|Balloon-Pattern):/ } $fsfile->tail),
-		    (map {"//Tred:Custom-Attribute:$_\n"}
-		     map {
-		       join "\n//Tred:Custom-AttributeCont:",
-			 split /\n/,$_
-		       } $fsfile->patterns),
-		    (map {"//Tred:Balloon-Pattern:$_\n"}
-		     split /\n/,$fsfile->hint),
-		   );
+                    (grep { $_!~/\/\/Tred:(?:Custom-Attribute(?:Cont)?|Balloon-Pattern):/ } $fsfile->tail),
+                    (map {"//Tred:Custom-Attribute:$_\n"}
+                     map {
+                       join "\n//Tred:Custom-AttributeCont:",
+                         split /\n/,$_
+                       } $fsfile->patterns),
+                    (map {"//Tred:Balloon-Pattern:$_\n"}
+                     split /\n/,$fsfile->hint),
+                   );
   print $fileref $fsfile->tail;
   if (ref($fsfile->metaData('fs-require'))) {
     my $refnames = $fsfile->metaData('refnames') || {};
@@ -272,8 +272,8 @@ sub write {
 
 sub Print ($$) {
   my (
-      $output,			# filehandle or string
-      $text			# text
+      $output,   # filehandle or string
+      $text      # text
      )=@_;
   if (ref($output) eq 'SCALAR') {
     $$output.=$text;
@@ -290,8 +290,8 @@ sub PrintFSFile {
 }
 
 sub PrintFSTree {
-  my ($root,  # a reference to the root-node
-      $fsformat, # FSFormat object
+  my ($root,      # a reference to the root-node
+      $fsformat,  # FSFormat object
       $fh,
       $emu_schema
      )=@_;
@@ -319,9 +319,9 @@ sub PrintFSTree {
 }
 
 sub PrintFSNode {
-  my ($node,			# a reference to the root-node
+  my ($node,      # a reference to the root-node
       $fsformat,
-      $output,			# output stream
+      $output,    # output stream
       $emu_schema
      )=@_;
   my $v;
@@ -337,20 +337,20 @@ sub PrintFSNode {
       $v=$emu_schema ? $node->attr($attrs->[$n]) : $node->{$attrs->[$n]};
       $v=~s/([,\[\]=\\\n])/\\$1/go if (defined($v));
       if (index($defs->{$attrs->[$n]}, " O")>=0) {
-	Print($output,",") if $n;
-	unless ($lastprinted && index($defs->{$attrs->[$n]}," P")>=0) # N could match here too probably
-	  { Print($output, $attrs->[$n]."="); }
-	$v='-' if ($v eq '' or not defined($v));
-	Print($output,$v);
-	$lastprinted=1;
+        Print($output,",") if $n;
+        unless ($lastprinted && index($defs->{$attrs->[$n]}," P")>=0) # N could match here too probably
+          { Print($output, $attrs->[$n]."="); }
+        $v='-' if ($v eq '' or not defined($v));
+        Print($output,$v);
+        $lastprinted=1;
       } elsif (defined($v) and length($v)) {
-	Print($output,",") if $n;
-	unless ($lastprinted && index($defs->{$attrs->[$n]}," P")>=0) # N could match here too probably
-	  { Print($output,$attrs->[$n]."="); }
-	Print($output,$v);
-	$lastprinted=1;
+        Print($output,",") if $n;
+        unless ($lastprinted && index($defs->{$attrs->[$n]}," P")>=0) # N could match here too probably
+          { Print($output,$attrs->[$n]."="); }
+        Print($output,$v);
+        $lastprinted=1;
       } else {
-	$lastprinted=0;
+        $lastprinted=0;
       }
     }
     Print($output,"]");
@@ -393,22 +393,22 @@ sub ParseFSTree {
       $c = substr($l,0,1);
       $l = substr($l,1);
       if ( $c eq '(' ) { # Create son (go down)
-	my $first_son = $curr->{$Treex::PML::Node::firstson} = ParseFSNode($fsformat,\$l,$ordhash,$emu_schema_type);
-	$first_son->{$Treex::PML::Node::parent}=$curr;
-	$curr=$first_son;
-	next;
+        my $first_son = $curr->{$Treex::PML::Node::firstson} = ParseFSNode($fsformat,\$l,$ordhash,$emu_schema_type);
+        $first_son->{$Treex::PML::Node::parent}=$curr;
+        $curr=$first_son;
+        next;
       }
       if ( $c eq ')' ) { # Return to parent (go up)
-	croak "Error paring tree" if ($curr eq $root);
-	$curr=$curr->{$Treex::PML::Node::parent};
-	next;
+        croak "Error paring tree" if ($curr eq $root);
+        $curr=$curr->{$Treex::PML::Node::parent};
+        next;
       }
       if ( $c eq ',' ) { # Create right brother (go right);
-	my $rb = $curr->{$Treex::PML::Node::rbrother} = ParseFSNode($fsformat,\$l,$ordhash,$emu_schema_type);
-	$rb->set_lbrother( $curr );
-	$rb->set_parent( $curr->{$Treex::PML::Node::parent} );
-	$curr=$rb;
-	next;
+        my $rb = $curr->{$Treex::PML::Node::rbrother} = ParseFSNode($fsformat,\$l,$ordhash,$emu_schema_type);
+        $rb->set_lbrother( $curr );
+        $rb->set_parent( $curr->{$Treex::PML::Node::parent} );
+        $curr=$rb;
+        next;
       }
       croak "Unexpected token... `$c'!\n$l\n";
     }
@@ -453,25 +453,25 @@ sub ParseFSNode {
       $w=shift @ats;
       $i=index($w,'=');
       if ($i>=0) {
-	$a=substr($w,0,$i);
-	$v=substr($w,$i+1);
-	$tmp=$ordhash->{$a};
-	$n = $tmp if (defined($tmp));
+        $a=substr($w,0,$i);
+        $v=substr($w,$i+1);
+        $tmp=$ordhash->{$a};
+        $n = $tmp if (defined($tmp));
       } else {
-	$v=$w;
+        $v=$w;
         $n++ while ( $n<$attr_count and $defs->{$attrs->[$n]}!~/ [PNW]/);
-	if ($n>$attr_count) {
-	  croak "No more positional attribute $n for value $v at position in:\n".$n."\n";
-	}
-	$a=$attrs->[$n];
+        if ($n>$attr_count) {
+          croak "No more positional attribute $n for value $v at position in:\n".$n."\n";
+        }
+        $a=$attrs->[$n];
       }
       if ($CheckListValidity) {
-	if ($fsformat->isList($a)) {
-	  @lv=$fsformat->listValues($a);
-	  foreach $tmp (split /\|/,$v) {
-	    print("Invalid list value $v of atribute $a no in @lv:\n$nd\n" ) unless (defined(Index(\@lv,$tmp)));
-	  }
-	}
+        if ($fsformat->isList($a)) {
+          @lv=$fsformat->listValues($a);
+          foreach $tmp (split /\|/,$v) {
+            print("Invalid list value $v of atribute $a no in @lv:\n$nd\n" ) unless (defined(Index(\@lv,$tmp)));
+          }
+        }
       }
       $n++;
       $v=~s/&comma;/,/g;
@@ -481,11 +481,11 @@ sub ParseFSNode {
       $v=~s/&backslash;/\\/g;
       $v=~s/&amp;/&/g;
       if ($emu_schema_type and $a=~/\//) {
-	$node->set_attr($a,$v);
+        $node->set_attr($a,$v);
       } else {
-	# speed optimized version
-	#      $node->setAttribute($a,$v);
-	$node->{$a}=$v;
+        # speed optimized version
+        #      $node->setAttribute($a,$v);
+        $node->{$a}=$v;
       }
     }
   } else { croak $$lr," not node!\n"; }
@@ -498,7 +498,7 @@ sub ReadLine {
   if (ref($handle) eq 'ARRAY') {
     $_=shift @$handle;
   } else { $_=<$handle>;
-	   return $_; }
+           return $_; }
   return $_;
 }
 

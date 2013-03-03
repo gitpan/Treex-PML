@@ -27,7 +27,7 @@ available, too.
 See http://ufal.mff.cuni.cz/jazz/pml/
 
 Note: this library was originally developed for the TrEd framework
-(http://ufal.mff.cuni.cz/~pajas/tred) and evolved gradually from an
+(http://ufal.mff.cuni.cz/tred) and evolved gradually from an
 older library called Fslib implementing a different data format.
 
 INSTALLATION

@@ -4,8 +4,8 @@
 # See the bottom of this file for the POD documentation. Search for the
 # string '=head'.
 
-# Author: Petr Pajas
-# E-mail: pajas@ufal.mff.cuni.cz
+# Authors: Petr Pajas, Jan Stepanek
+# E-mail: tred@ufal.mff.cuni.cz
 #
 # Description:
 # Several Perl Routines to handle files in treebank FS format
@@ -16,7 +16,7 @@ package Treex::PML;
 use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION $API_VERSION %COMPATIBLE_API_VERSION
             $FSError $Debug $resourcePath $resourcePathSplit @BACKENDS);
 BEGIN {
-$VERSION = "2.10";        # change when new functions are added etc
+$VERSION = "2.11";        # change when new functions are added etc
 }
 
 
@@ -462,7 +462,7 @@ since. Conversion tools for various existing treebank formats are
 available, too.
 
 This library was originally developed for the TrEd framework
-(L<http://ufal.mff.cuni.cz/~pajas/tred>) and evolved gradually from an
+(L<http://ufal.mff.cuni.cz/tred>) and evolved gradually from an
 older library called Fslib, implementing an older data format called
 FS format L<http://ufal.mff.cuni.cz/pdt2.0/doc/data-formats/fs/index.html>
 (this format is still fully supported by the current
@@ -899,7 +899,7 @@ C<ImportBackends>, C<CloneValue>, C<ResourcePaths>, C<FindInResources>, C<FindDi
 
 =head1 SEE ALSO
 
-Tree editor TrEd: L<http://ufal.mff.cuni.cz/~pajas/tred>
+Tree editor TrEd: L<http://ufal.mff.cuni.cz/tred>
 
 Prague Markup Language (PML) format:
 L<http://ufal.mff.cuni.cz/jazz/PML/>
@@ -941,7 +941,7 @@ L<http://search.cpan.org/dist/Treex-PML/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2010 by Petr Pajas
+Copyright (C) 2006-2013 by Petr Pajas, Jan Stepanek
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,

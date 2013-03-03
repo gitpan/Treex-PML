@@ -26,7 +26,7 @@ my $builder = $class->new(
     module_name         => 'Treex::PML',
     license             => 'perl',
     dist_abstract	=> 'Perl implementation of the Prague Markup Language (PML) and related data models.',
-    dist_author         => q{Petr Pajas <pajas@matfyz.cz>},
+    dist_author         => q{Petr Pajas <tred@ufal.mff.cuni.cz>},
     dist_version_from   => 'lib/Treex/PML.pm',
 
     share_dir => {

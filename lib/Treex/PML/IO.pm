@@ -44,15 +44,15 @@ use Cwd qw(getcwd);
 
 use vars qw(@ISA $VERSION @EXPORT @EXPORT_OK
             %UNLINK_ON_CLOSE
-	    $Debug
-	    $kioclient $kioclient_opts
-	    $ssh $ssh_opts
-	    $curl $curl_opts
-	    $gzip $gzip_opts
-	    $zcat $zcat_opts
-	    $reject_proto
-	    $lwp_user_agent
-	   );
+            $Debug
+            $kioclient $kioclient_opts
+            $ssh $ssh_opts
+            $curl $curl_opts
+            $gzip $gzip_opts
+            $zcat $zcat_opts
+            $reject_proto
+            $lwp_user_agent
+           );
 
 sub DOES {
   my ($self,$role)=@_;
@@ -77,24 +77,24 @@ BEGIN {
       \&File::Which::which
   } || sub {};
 
-  $VERSION = '2.10'; # version template
+  $VERSION = '2.04'; # version template
   @ISA=qw(Exporter);
   @EXPORT_OK = qw($kioclient $kioclient_opts
-		  $ssh $ssh_opts
-		  $curl $curl_opts
-		  $gzip $gzip_opts
-		  $zcat $zcat_opts
-		  &set_encoding
-		  &open_backend &open_uri &close_backend &close_uri
-		  &get_protocol &quote_filename
-		  &rename_uri);
+                  $ssh $ssh_opts
+                  $curl $curl_opts
+                  $gzip $gzip_opts
+                  $zcat $zcat_opts
+                  &set_encoding
+                  &open_backend &open_uri &close_backend &close_uri
+                  &get_protocol &quote_filename
+                  &rename_uri);
 
-  $zcat	      ||= _find_exe('zcat');
-  $gzip	      ||= _find_exe('gzip');
-  $kioclient  ||= _find_exe('kioclient');
-  $ssh	      ||= _find_exe('ssh');
-  $curl	      ||= _find_exe('curl');
-  $ssh_opts   ||= '-C';
+  $zcat         ||= _find_exe('zcat');
+  $gzip         ||= _find_exe('gzip');
+  $kioclient    ||= _find_exe('kioclient');
+  $ssh          ||= _find_exe('ssh');
+  $curl         ||= _find_exe('curl');
+  $ssh_opts     ||= '-C';
   $reject_proto ||= '^(pop3?s?|imaps?)\$';
   $lwp_user_agent = Treex::PML::IO::UserAgent->new(keep_alive=>1);
   $lwp_user_agent->agent("Treex::PML_IO/$VERSION");
@@ -302,7 +302,7 @@ sub make_URI {
   my $uri = URI->new($url);
   return $uri if blessed($url) and $url->isa('URI'); # return a copy if was URI already
   if (($uri eq $url or URI::Escape::uri_unescape($uri) eq $url)
-	and $url =~ m(^\s*[[:alnum:]]+://)) { # looks like it is URL already
+        and $url =~ m(^\s*[[:alnum:]]+://)) { # looks like it is URL already
     return $uri;
   } else {
     return URI::file->new($url);
@@ -417,9 +417,9 @@ sub open_pipe {
   if (_is_gzip($file)) {
     if (-x $gzip && -x $zcat) {
       if ($rw eq 'w') {
-	open $fh, "| $pipe | $gzip $gzip_opts > ".quote_filename($file) || undef $fh;
+        open $fh, "| $pipe | $gzip $gzip_opts > ".quote_filename($file) || undef $fh;
       } else {
-	open $fh, "$zcat $zcat_opts < ".quote_filename($file)." | $pipe |" || undef $fh;
+        open $fh, "$zcat $zcat_opts < ".quote_filename($file)." | $pipe |" || undef $fh;
       }
     } else {
       warn "Need a functional gzip and zcat to open this file\n";
@@ -452,9 +452,9 @@ sub _open_file_zcat {
    if (-x $gzip) {
       $fh = new IO::Pipe();
       if ($rw eq 'w') {
-	$fh->writer("$gzip $gzip_opts > ".quote_filename($file)) || undef $fh;
+        $fh->writer("$gzip $gzip_opts > ".quote_filename($file)) || undef $fh;
       } else {
-	$fh->reader("$zcat $zcat_opts < ".quote_filename($file)) || undef $fh;
+        $fh->reader("$zcat $zcat_opts < ".quote_filename($file)) || undef $fh;
       }
    }
    unless ($fh) {
@@ -494,14 +494,14 @@ sub open_file {
     } else {
       my $tmp;
       eval {
-	require IO::Zlib;
-	$tmp = new IO::Zlib();
+        require IO::Zlib;
+        $tmp = new IO::Zlib();
       } && $tmp || return;
       $tmp->open($file,"rb") || return;
       my $buffer;
       my $length = 1024*1024;
       while (read($tmp,$buffer,$length)) {
-	$fh->print($buffer);
+        $fh->print($buffer);
       }
       $tmp->close();
       seek($fh,0,SEEK_SET);
@@ -571,9 +571,9 @@ sub fetch_file {
   my ($file,$unlink) = &_fetch_file;
   if (get_protocol($file) eq 'file' and _is_gzip($uri)) {
     my ($fh,$ungzfile) = File::Temp::tempfile("tredgzioXXXXXX",
-					      DIR => File::Spec->tmpdir(),
-					      UNLINK => 0,
-					     );
+                                              DIR => File::Spec->tmpdir(),
+                                              UNLINK => 0,
+                                             );
     die "Cannot create temporary file: $!" unless $fh;
     my $tmp;
     eval {
@@ -629,10 +629,10 @@ sub _fetch_with_lwp {
 sub _fetch_file_win32 {
   my ($uri,$proto)=@_;
   my ($fh,$filename) = File::Temp::tempfile("tredioXXXXXX",
-					    DIR => File::Spec->tmpdir(),
-					    SUFFIX => (_is_gzip($uri) ? ".gz" : ""),
-					    UNLINK => 0,
-					   );
+                                            DIR => File::Spec->tmpdir(),
+                                            SUFFIX => (_is_gzip($uri) ? ".gz" : ""),
+                                            UNLINK => 0,
+                                           );
   print STDERR __PACKAGE__.": fetching URI $uri as proto $proto to $filename\n" if $Debug;
   if ($proto=~m(^https?|ftp|gopher|news)) {
     return _fetch_with_lwp($uri,$fh,$filename);
@@ -644,10 +644,10 @@ sub _fetch_file_posix {
   my ($uri,$proto)=@_;
   print STDERR __PACKAGE__.": fetching file using protocol $proto ($uri)\n" if $Debug;
   my ($fh,$tempfile) = File::Temp::tempfile("tredioXXXXXX",
-					    DIR => File::Spec->tmpdir(),
-					    SUFFIX => (_is_gzip($uri) ? ".gz" : ""),
-					    UNLINK => 0,
-					   );
+                                            DIR => File::Spec->tmpdir(),
+                                            SUFFIX => (_is_gzip($uri) ? ".gz" : ""),
+                                            UNLINK => 0,
+                                           );
   print STDERR __PACKAGE__.": tempfile: $tempfile\n" if $Debug;
   if ($proto=~m(^https?|ftp|gopher|news)) {
     return _fetch_with_lwp($uri,$fh,$tempfile);
@@ -659,8 +659,8 @@ sub _fetch_file_posix {
       my ($host,$file) = ($1,$2);
       print STDERR __PACKAGE__.": tempfile: $tempfile\n" if $Debug;
       return
-	_fetch_cmd($ssh." ".$ssh_opts." ".quote_filename($host).
-	" /bin/cat ".quote_filename(quote_filename($file)),$tempfile);
+        _fetch_cmd($ssh." ".$ssh_opts." ".quote_filename($host).
+        " /bin/cat ".quote_filename(quote_filename($file)),$tempfile);
     } else {
       die "failed to parse URI for ssh $uri\n";
     }
@@ -672,7 +672,7 @@ sub _fetch_file_posix {
       ($uri =~ s{^\s*ssh:(?://)?([/:]*)[:/]}{fish://$1/});
     }
     return _fetch_cmd($kioclient." ".$kioclient_opts.
-		     " cat ".quote_filename($uri),$tempfile);
+                     " cat ".quote_filename($uri),$tempfile);
   }
   if ($curl and -x $curl and $proto =~ /^(?:https?|ftps?|gopher)$/) {
     return _fetch_cmd($curl." ".$curl_opts." ".quote_filename($uri),$tempfile);
@@ -715,8 +715,8 @@ sub _get_upload_fh_posix {
     if ($uri =~ m{^\s*(?:ssh|sftp|fish):(?://)?([^-/][^/]*)(/.*)$}) {
       my ($host,$file) = ($1,$2);
       return _open_upload_pipe(_is_gzip($uri), $userpipe, "$ssh $ssh_opts ".
-		       quote_filename($host)." /bin/cat \\> ".
-			      quote_filename(quote_filename($file)));
+                       quote_filename($host)." /bin/cat \\> ".
+                              quote_filename(quote_filename($file)));
     } else {
       die "failed to parse URI for ssh $uri\n";
     }
@@ -728,7 +728,7 @@ sub _get_upload_fh_posix {
       $uri =~ s{^\s*ssh:(?://)?([/:]*)[:/]}{fish://$1/};
     }
     return _open_upload_pipe(_is_gzip($uri),$userpipe,
-		     "$kioclient $kioclient_opts put ".quote_filename($uri));
+                     "$kioclient $kioclient_opts put ".quote_filename($uri));
   }
   if ($curl and -x $curl and $proto =~ /^(?:ftps?)$/) {
     return _open_upload_pipe("$curl --upload-file - $curl_opts ".quote_filename($uri));
@@ -804,7 +804,7 @@ sub _unlink_uri_posix {
     if ($uri =~ m{^\s*(?:ssh|sftp|fish):(?://)?([^-/][^/]*)(/.*)$}) {
       my ($host,$file) = ($1,$2);
       return (system("$ssh $ssh_opts ".quote_filename($host)." /bin/rm ".
-		     quote_filename(quote_filename($file)))==0) ? 1 : 0;
+                     quote_filename(quote_filename($file)))==0) ? 1 : 0;
     } else {
       die "failed to parse URI for ssh $uri\n";
     }
@@ -864,12 +864,12 @@ sub _rename_uri_posix {
     if ($uri1 =~ m{^\s*(?:ssh|sftp|fish):(?://)?([^-/][^/]*)(/.*)$}) {
       my ($host,$file) = ($1,$2);
       if ($uri2 =~ m{^\s*(?:ssh|sftp|fish):(?://)?([^-/][^/]*)(/.*)$} and $1 eq $host) {
-	my $file2 = $2;
-	return (system("$ssh $ssh_opts ".quote_filename($host)." /bin/mv ".
-		       quote_filename(quote_filename($file))." ".
-		       quote_filename(quote_filename($file2)))==0) ? 1 : 0;
+        my $file2 = $2;
+        return (system("$ssh $ssh_opts ".quote_filename($host)." /bin/mv ".
+                       quote_filename(quote_filename($file))." ".
+                       quote_filename(quote_filename($file2)))==0) ? 1 : 0;
       } else {
-	die "failed to parse URI for ssh $uri2\n";
+        die "failed to parse URI for ssh $uri2\n";
       }
     } else {
       die "failed to parse URI for ssh $uri1\n";
@@ -882,7 +882,7 @@ sub _rename_uri_posix {
       $uri2 =~ s{^\s*ssh:(?://)?([/:]*)[:/]}{fish://$1/};
     }
     return (system("$kioclient $kioclient_opts mv ".quote_filename($uri1).
-		     " ".quote_filename($uri2))==0 ? 1 : 0);
+                     " ".quote_filename($uri2))==0 ? 1 : 0);
   }
   die "No handlers for protocol $proto\n";
 }

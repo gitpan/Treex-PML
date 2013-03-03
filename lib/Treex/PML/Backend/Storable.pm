@@ -6,7 +6,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.10'; # version template
+  $VERSION='2.04'; # version template
 }
 use UNIVERSAL::DOES;
 use Scalar::Util qw(blessed reftype refaddr);
@@ -78,19 +78,19 @@ sub write {
     $savedAppData->{'id-hash'} = $fs->appData('id-hash');
     $savedAppData->{'ref'} = {
       map {
-      	my $val = $ref->{$_};
-      	UNIVERSAL::DOES::does($val,'Treex::PML::Instance') ? ($_ => $val) : ()
+        my $val = $ref->{$_};
+        UNIVERSAL::DOES::does($val,'Treex::PML::Instance') ? ($_ => $val) : ()
       } keys %$ref
     } if ref $ref;
   }
   nstore_fd([$fs->FS,
-	     $fs->treeList,
-	     [$fs->tail],
-	     $metaData,
-	     [$fs->patterns],
-	     $fs->hint,
-	     $Treex::PML::API_VERSION
-	    ],$fd);
+             $fs->treeList,
+             [$fs->tail],
+             $metaData,
+             [$fs->patterns],
+             $fs->hint,
+             $Treex::PML::API_VERSION
+            ],$fd);
 }
 
 sub upgrade_from_fslib {
@@ -105,25 +105,25 @@ sub upgrade_from_fslib {
     if (defined $is) {
       if ($is =~ /^Treex/) {
       } elsif ($is eq 'FSNode') {
-	bless $object, 'Treex::PML::Node';
+        bless $object, 'Treex::PML::Node';
       } elsif ($is eq 'Fslib::Type') {
-	bless $object, 'Treex::PML::Backend::Storable::CopmpatType';
+        bless $object, 'Treex::PML::Backend::Storable::CopmpatType';
       } elsif ($is =~ /^Fslib::(.*)$/) {
-	bless $object, qq{Treex::PML::$1};
+        bless $object, qq{Treex::PML::$1};
       } elsif ($is =~ /^PMLSchema(::.*)?$/) {
-	bless $object, qq{Treex::PML::Schema$1};
+        bless $object, qq{Treex::PML::Schema$1};
       } elsif ($is eq 'FSFile') {
-	bless $object, 'Treex::PML::Document';
+        bless $object, 'Treex::PML::Document';
       } elsif ($is eq 'FSFormat') {
-	bless $object, 'Treex::PML::FSFormat';
+        bless $object, 'Treex::PML::FSFormat';
       } elsif ($is eq 'PMLInstance') {
-	bless $object, 'Treex::PML::Instance';
+        bless $object, 'Treex::PML::Instance';
       }
       $ref = reftype($object);
     }
     for (($ref eq 'HASH') ? values(%$object)
-	   : ($ref eq 'ARRAY') ? @$object
-	   : ($ref eq 'SCALAR') ? $$object : ()) {
+           : ($ref eq 'ARRAY') ? @$object
+           : ($ref eq 'SCALAR') ? $$object : ()) {
       my $key = refaddr($_) || next;
       push @next, $_ unless ($seen{$key}++);
     }

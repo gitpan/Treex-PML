@@ -7,7 +7,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.10'; # version template
+  $VERSION='2.04'; # version template
 }
 
 use vars qw($ntred);
@@ -132,7 +132,7 @@ updated, leaving other trees intact.
 
 =head2 SEE ALSO
 
-TrEd toolkit (L<http://ufal.mff.cuni.cz/~pajas/tred>)
+TrEd toolkit (L<http://ufal.mff.cuni.cz/tred>)
 
 =head2 REFERENCE
 

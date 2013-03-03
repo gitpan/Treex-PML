@@ -2,7 +2,7 @@ package Treex::PML::Backend::CSTS::Csts2fs;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.10'; # version template
+  $VERSION='2.04'; # version template
 }
 use Treex::PML;
 
@@ -136,312 +136,312 @@ sub assign_quot_dsp {
 }
 
 my %start_tag = (
-		 's' => [sub {
-			   my ($s)=@_;
-			   &make_new_tree(@_);
-			   $s->{treeNo}++;
-			   $s->{ID2}=$s->{file};
-			   $s->{root}->{form}="#$s->{treeNo}";
-			   $s->{root}->{origf}=$s->{root}->{form};
-			   $s->{root}->{afun}="AuxS";
-			   $s->{root}->{ord}=0;
-			   $s->{root}->{sentord}=0;
-			   $s->{root}->{dord}=0;
-			   $s->{root}->{tag}="Z#-------------";
-			   $s->{root}->{lemma}="#";
-			   $s->{root}->{trlemma}=$s->{root}->{form};
-			   $s->{root}->{TR}="";
-			   $s->{root}->{ARhide}='';
-			   $s->{root}->{X_hide}='';
-			   $s->{root}->{func}="SENT";
-			 }],
-		 'salt' => [sub {
-			      my ($s)=@_;
-			      &make_new_tree(@_);
-			      $s->{root}->{form}="#$s->{treeNo}.alt";
-			      $s->{root}->{origf}=$s->{root}->{form};
-			      $s->{root}->{ord}=0;
-			      $s->{root}->{dord}=0;
-			      $s->{root}->{sentord}=0;
-			      $s->{root}->{afun}="AuxS";
-			      $s->{root}->{tag}="Z#-------------";
-			      $s->{root}->{lemma}="#";
-			      $s->{root}->{trlemma}=$s->{root}->{form};
-			      $s->{root}->{TR}="";
-			      $s->{root}->{ARhide}='';
-			      $s->{root}->{X_hide}='';
-			      $s->{root}->{func}="SENT";
-			    }],
-		 'f' => [\&make_new_node,0],
-		 'd' => [\&make_new_node,0],
-		 'fadd' => [\&make_new_node,1],
-		 'TRl' => [sub {
-			     my ($s)=@_;
-			     # inicialization may be altered to fill
-			     # 'hide' here otherwise
-			     $s->{node}->{TR}="";
-			   }],
-		 'MTRl' => [sub {
-			      my ($s)=@_;
-			      # inicialization may be altered to fill
-			      # 'hide' here otherwise (maybe not easy as
-			      # these attributes are generated)
-			      to_composed_node_attr($s,"","_","","src","MTR");
-			    }],
-#		 'D' => [\&copy_tag_to,'','<','!GAP'],
-		 'D' => [sub {
-			   my ($s)=@_;
-			   if ($s->{node}) {
-			     $s->{node}->{nospace}=1;
-			   } else {
-			     copy_tag_to(@_,'','<','!GAP');
-#			     $s->{following}->{$no_node_gap}.="<D>";
-			   }
-			 }],
+                 's' => [sub {
+                           my ($s)=@_;
+                           &make_new_tree(@_);
+                           $s->{treeNo}++;
+                           $s->{ID2}=$s->{file};
+                           $s->{root}->{form}="#$s->{treeNo}";
+                           $s->{root}->{origf}=$s->{root}->{form};
+                           $s->{root}->{afun}="AuxS";
+                           $s->{root}->{ord}=0;
+                           $s->{root}->{sentord}=0;
+                           $s->{root}->{dord}=0;
+                           $s->{root}->{tag}="Z#-------------";
+                           $s->{root}->{lemma}="#";
+                           $s->{root}->{trlemma}=$s->{root}->{form};
+                           $s->{root}->{TR}="";
+                           $s->{root}->{ARhide}='';
+                           $s->{root}->{X_hide}='';
+                           $s->{root}->{func}="SENT";
+                         }],
+                 'salt' => [sub {
+                              my ($s)=@_;
+                              &make_new_tree(@_);
+                              $s->{root}->{form}="#$s->{treeNo}.alt";
+                              $s->{root}->{origf}=$s->{root}->{form};
+                              $s->{root}->{ord}=0;
+                              $s->{root}->{dord}=0;
+                              $s->{root}->{sentord}=0;
+                              $s->{root}->{afun}="AuxS";
+                              $s->{root}->{tag}="Z#-------------";
+                              $s->{root}->{lemma}="#";
+                              $s->{root}->{trlemma}=$s->{root}->{form};
+                              $s->{root}->{TR}="";
+                              $s->{root}->{ARhide}='';
+                              $s->{root}->{X_hide}='';
+                              $s->{root}->{func}="SENT";
+                            }],
+                 'f' => [\&make_new_node,0],
+                 'd' => [\&make_new_node,0],
+                 'fadd' => [\&make_new_node,1],
+                 'TRl' => [sub {
+                             my ($s)=@_;
+                             # inicialization may be altered to fill
+                             # 'hide' here otherwise
+                             $s->{node}->{TR}="";
+                           }],
+                 'MTRl' => [sub {
+                              my ($s)=@_;
+                              # inicialization may be altered to fill
+                              # 'hide' here otherwise (maybe not easy as
+                              # these attributes are generated)
+                              to_composed_node_attr($s,"","_","","src","MTR");
+                            }],
+#                 'D' => [\&copy_tag_to,'','<','!GAP'],
+                 'D' => [sub {
+                           my ($s)=@_;
+                           if ($s->{node}) {
+                             $s->{node}->{nospace}=1;
+                           } else {
+                             copy_tag_to(@_,'','<','!GAP');
+#                             $s->{following}->{$no_node_gap}.="<D>";
+                           }
+                         }],
 
-		 'mauth' => [sub {
-		   my ($s)=@_;
-		   if (($s->{elements}->[-3]||'') eq 'h') {
-		     copy_tag_to_following_root(@_,'','<','cstsmarkup');
-		   } else {
-		     copy_tag_to_following_root(@_,'','<','docmarkup');
-		   }
-		 }],
-		 'mdate' => [sub {
-		   my ($s)=@_;
-		   if (($s->{elements}->[-3]||'') eq 'h') {
-		     copy_tag_to_following_root(@_,'','<','cstsmarkup');
-		   } else {
-		     copy_tag_to_following_root(@_,'','<','docmarkup');
-		   }
-		 }],
-		 'mdesc' => [sub {
-		   my ($s)=@_;
-		   if (($s->{elements}->[-3]||'') eq 'h') {
-		     copy_tag_to_following_root(@_,'','<','cstsmarkup');
-		   } else {
-		     copy_tag_to_following_root(@_,'','<','docmarkup');
-		   }
-		 }],
-		 'doc' => [sub {
-			   my ($s)=@_;
-			   my %attributes = map @$_, @{$s->{attributes}[-1]};
-			   $s->{following_root}->{doc}=$attributes{'file'};
-			   $s->{following_root}->{docid}=$attributes{'id'};
-			 }],
-		 'mod' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'txtype' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'genre' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'c' => [sub {
-			   shift->{following_root}->{chap}='1';
-			 }],
-		 'verse' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'med' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'authsex' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'lang' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'transsex' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'srclang' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'temp' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'firsted' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'authname' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'transname' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'opus' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'id' => [\&copy_tag_to_following_root,'','<','docprolog'],
-		 'i' => [\&copy_tag_to,'','<','!GAP'],
-		 'idioms' => [\&copy_tag_to,'','<','!GAP'],
-		 'idiom' => [\&copy_tag_to,'','<','!GAP'],
-		 'iref' => [\&copy_tag_to,'','<','!GAP'],
-		 );
+                 'mauth' => [sub {
+                   my ($s)=@_;
+                   if (($s->{elements}->[-3]||'') eq 'h') {
+                     copy_tag_to_following_root(@_,'','<','cstsmarkup');
+                   } else {
+                     copy_tag_to_following_root(@_,'','<','docmarkup');
+                   }
+                 }],
+                 'mdate' => [sub {
+                   my ($s)=@_;
+                   if (($s->{elements}->[-3]||'') eq 'h') {
+                     copy_tag_to_following_root(@_,'','<','cstsmarkup');
+                   } else {
+                     copy_tag_to_following_root(@_,'','<','docmarkup');
+                   }
+                 }],
+                 'mdesc' => [sub {
+                   my ($s)=@_;
+                   if (($s->{elements}->[-3]||'') eq 'h') {
+                     copy_tag_to_following_root(@_,'','<','cstsmarkup');
+                   } else {
+                     copy_tag_to_following_root(@_,'','<','docmarkup');
+                   }
+                 }],
+                 'doc' => [sub {
+                           my ($s)=@_;
+                           my %attributes = map @$_, @{$s->{attributes}[-1]};
+                           $s->{following_root}->{doc}=$attributes{'file'};
+                           $s->{following_root}->{docid}=$attributes{'id'};
+                         }],
+                 'mod' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'txtype' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'genre' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'c' => [sub {
+                           shift->{following_root}->{chap}='1';
+                         }],
+                 'verse' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'med' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'authsex' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'lang' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'transsex' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'srclang' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'temp' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'firsted' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'authname' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'transname' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'opus' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'id' => [\&copy_tag_to_following_root,'','<','docprolog'],
+                 'i' => [\&copy_tag_to,'','<','!GAP'],
+                 'idioms' => [\&copy_tag_to,'','<','!GAP'],
+                 'idiom' => [\&copy_tag_to,'','<','!GAP'],
+                 'iref' => [\&copy_tag_to,'','<','!GAP'],
+                 );
 
 my %end_tag = (
-	       'csts' => [ \&make_last_tree ],
-	      );
+               'csts' => [ \&make_last_tree ],
+              );
 
 my %att = (
-	   'p n' => [sub { my($s,$data)=@_;
-			   $s->{following_root}->{para}=$data;
-			 }],
-	   'A parallel' => [\&to_node_attr,'|','parallel'],
-	   'A paren' => [\&to_node_attr,'|','paren'],
-	   'A arabfa' => [\&to_node_attr,'|','arabfa'],
-	   'A arabspec' => [\&to_node_attr,'|','arabspec'],
-	   'A arabclause' => [\&to_node_attr,'|','arabclause'],
-	   'MDt w' => [\&to_composed_node_attr,'_','|','src','wMDt'],
-	   'MDl w' => [\&to_composed_node_attr,'_','|','src','wMDl'],
-	   'MDA w' => [\&to_composed_node_attr,'_','|','src','wMDA'],
-	   'MDA parallel' => [\&to_composed_node_attr,'_','|','src','parallelMD'],
-	   'MDA paren' => [\&to_composed_node_attr,'_','|','src','parenMD'],
-	   'MDA arabfa' => [\&to_composed_node_attr,'_','|','src','arabfaMD'],
-	   'MDA arabspec' => [\&to_composed_node_attr,'_','|','src','arabspecMD'],
-	   'MDA arabclause' => [\&to_composed_node_attr,'_','|','src','arabclauseMD'],
-	   'MDg w' => [\&to_composed_node_attr,'_','|','src','wMDg'],
-	   'wsd s' => [\&to_node_attr,'|','wsds'],
-	   'wsd ewn' => [\&to_node_attr,'|','wsdewn'],
-	   'wsd ili' => [\&to_node_attr,'|','wsdili'],
-	   'wsd iliOffset' => [\&to_node_attr,'|','wsdiliOffset'],
-	   's id' => [\&to_attr,'root','|','ID1'],
-	   'salt id' => [\&to_attr,'root','|','ID1'],
-	   'csts lang' => [\&to_node_attr,'|','cstslang'],
-	   'f case' => [\&to_node_attr,'|','formtype'],
-	   'f id' => [\&to_node_attr,'','AID'],
-	   'd type' => [\&to_node_attr,'|','formtype'],
-	   'd id' => [\&to_node_attr,'|','AID'],
-	   'w kind' => [\&to_next_node_attr,'|','origfkind'],
-	   't w'=> [\&to_node_attr,'|','wt'],
-	   'fadd id' => [\&to_node_attr,'','TID'],
-	   'fadd del' => [sub {
-			    my ($s,$data)=@_;
-			    &to_node_attr($s,uc($data),'|','del');
-			    &to_node_attr($s,'hide','','ARhide');
-			  }],
-	   'MTRl quot' => [\&to_composed_node_attr,'_','|','src','quotMTRl'],
-	   'TRl quot' => [\&assign_quot_dsp],
-	   'coref ref' => [\&to_node_attr,'|','coref'],
-	   'coref type' => [\&to_node_attr,'|','cortype'],
-	   'TRl status' => [sub {
-			    my ($s,$data)=@_;
-			    &to_node_attr($s,'hide','','TR')
-			      if ($data eq 'hidden');
-			  }],
-	   'MTRl status' => [sub {
-			       my ($s,$data)=@_;
-			       &to_composed_node_attr($s,'hide','_','|','src','MTR')
-				 if ($data eq 'hidden');
-			     }],
-	   'TRl origin' => [sub {
-			      my ($s,$data)=@_;
-			      $data=~s/\s+/|/g;
-			      &to_node_attr($s,$data,'','AIDREFS');
-			    }],
-	   'MTRl origin' => [sub {
-			       my ($s,$data)=@_;
-			       $data=~s/\s+/|/g;
-			       &to_composed_node_attr($s,$data,'_','','src','MAIDREFS');
-			     }],
-	   'x name' => [sub {
-			  my ($s,$data)=@_;
-			  $s->{node}->{X_hide}='' if ($data eq 'TNT');
-			}]
-	  );
+           'p n' => [sub { my($s,$data)=@_;
+                           $s->{following_root}->{para}=$data;
+                         }],
+           'A parallel' => [\&to_node_attr,'|','parallel'],
+           'A paren' => [\&to_node_attr,'|','paren'],
+           'A arabfa' => [\&to_node_attr,'|','arabfa'],
+           'A arabspec' => [\&to_node_attr,'|','arabspec'],
+           'A arabclause' => [\&to_node_attr,'|','arabclause'],
+           'MDt w' => [\&to_composed_node_attr,'_','|','src','wMDt'],
+           'MDl w' => [\&to_composed_node_attr,'_','|','src','wMDl'],
+           'MDA w' => [\&to_composed_node_attr,'_','|','src','wMDA'],
+           'MDA parallel' => [\&to_composed_node_attr,'_','|','src','parallelMD'],
+           'MDA paren' => [\&to_composed_node_attr,'_','|','src','parenMD'],
+           'MDA arabfa' => [\&to_composed_node_attr,'_','|','src','arabfaMD'],
+           'MDA arabspec' => [\&to_composed_node_attr,'_','|','src','arabspecMD'],
+           'MDA arabclause' => [\&to_composed_node_attr,'_','|','src','arabclauseMD'],
+           'MDg w' => [\&to_composed_node_attr,'_','|','src','wMDg'],
+           'wsd s' => [\&to_node_attr,'|','wsds'],
+           'wsd ewn' => [\&to_node_attr,'|','wsdewn'],
+           'wsd ili' => [\&to_node_attr,'|','wsdili'],
+           'wsd iliOffset' => [\&to_node_attr,'|','wsdiliOffset'],
+           's id' => [\&to_attr,'root','|','ID1'],
+           'salt id' => [\&to_attr,'root','|','ID1'],
+           'csts lang' => [\&to_node_attr,'|','cstslang'],
+           'f case' => [\&to_node_attr,'|','formtype'],
+           'f id' => [\&to_node_attr,'','AID'],
+           'd type' => [\&to_node_attr,'|','formtype'],
+           'd id' => [\&to_node_attr,'|','AID'],
+           'w kind' => [\&to_next_node_attr,'|','origfkind'],
+           't w'=> [\&to_node_attr,'|','wt'],
+           'fadd id' => [\&to_node_attr,'','TID'],
+           'fadd del' => [sub {
+                            my ($s,$data)=@_;
+                            &to_node_attr($s,uc($data),'|','del');
+                            &to_node_attr($s,'hide','','ARhide');
+                          }],
+           'MTRl quot' => [\&to_composed_node_attr,'_','|','src','quotMTRl'],
+           'TRl quot' => [\&assign_quot_dsp],
+           'coref ref' => [\&to_node_attr,'|','coref'],
+           'coref type' => [\&to_node_attr,'|','cortype'],
+           'TRl status' => [sub {
+                            my ($s,$data)=@_;
+                            &to_node_attr($s,'hide','','TR')
+                              if ($data eq 'hidden');
+                          }],
+           'MTRl status' => [sub {
+                               my ($s,$data)=@_;
+                               &to_composed_node_attr($s,'hide','_','|','src','MTR')
+                                 if ($data eq 'hidden');
+                             }],
+           'TRl origin' => [sub {
+                              my ($s,$data)=@_;
+                              $data=~s/\s+/|/g;
+                              &to_node_attr($s,$data,'','AIDREFS');
+                            }],
+           'MTRl origin' => [sub {
+                               my ($s,$data)=@_;
+                               $data=~s/\s+/|/g;
+                               &to_composed_node_attr($s,$data,'_','','src','MAIDREFS');
+                             }],
+           'x name' => [sub {
+                          my ($s,$data)=@_;
+                          $s->{node}->{X_hide}='' if ($data eq 'TNT');
+                        }]
+          );
 
 my %pcdata = (
-	      'source' => [\&to_node_attr,'','cstssource'],
-	      'mauth' => [sub {
-		my ($s)=@_;
-		if (($s->{elements}->[-3]||'') eq 'h') {
-		  to_attr(@_,'following_root','','cstsmarkup');
-		} else {
-		  to_attr(@_,'following_root','','docmarkup');
-		}
-	      }],
-	      'mdate' => [sub {
-		my ($s)=@_;
-		if (($s->{elements}->[-3]||'') eq 'h') {
-		  to_attr(@_,'following_root','','cstsmarkup');
-		} else {
-		  to_attr(@_,'following_root','','docmarkup');
-		}
-	      }],
-	      'mdesc' => [sub {
-		my ($s)=@_;
-		if (($s->{elements}->[-3]||'') eq 'h') {
-		  to_attr(@_,'following_root','','cstsmarkup');
-		} else {
-		  to_attr(@_,'following_root','','docmarkup');
-		}
-	      }],
-	      'mod' => [\&to_attr,'following_root','','docprolog'],
-	      'txtype' => [\&to_attr,'following_root','','docprolog'],
-	      'genre' => [\&to_attr,'following_root','','docprolog'],
-	      'verse' => [\&to_attr,'following_root','','docprolog'],
-	      'med' => [\&to_attr,'following_root','','docprolog'],
-	      'authsex' => [\&to_attr,'following_root','','docprolog'],
-	      'lang' => [\&to_attr,'following_root','','docprolog'],
-	      'transsex' => [\&to_attr,'following_root','','docprolog'],
-	      'srclang' => [\&to_attr,'following_root','','docprolog'],
-	      'temp' => [\&to_attr,'following_root','','docprolog'],
-	      'firsted' => [\&to_attr,'following_root','','docprolog'],
-	      'authname' => [\&to_attr,'following_root','','docprolog'],
-	      'transname' => [\&to_attr,'following_root','','docprolog'],
-	      'opus' => [\&to_attr,'following_root','','docprolog'],
-	      'id' => [\&to_attr,'following_root','','docprolog'],
-	      'i' => [\&to_node_attr,'','!GAP'],
-	      'iref' => [\&to_node_attr,'','!GAP'],
-	      MDt => [\&to_composed_node_attr,'_','|','src','tagMD'],
-	      MDl => [\&to_composed_node_attr,'_','|','src','lemmaMD'],
-	      MMt => [sub {
-			my ($s,$data) = @_;
-			# dirty hack to have the same number of MMl and MMt values
-			to_composed_node_attr(@_,'_','|','src','tagMM');
-			my $name;
-			for my $a (@{$s->{attributes}[-1]}) {
-			  if ($a->[0] eq 'src') {
-			    $name='MM_'.$a->[1];
-			    last;
-			  }
-			}
-			my @l = split /\|/,$s->{node}->{'lemma'.$name};
-			my @t = split /\|/,$s->{node}->{'tag'.$name};
-			$s->{node}->{'lemma'.$name}.='|'.$l[$#l] if (@l == scalar(@t)-1);
-		      }],
-	      MMl => [\&to_composed_node_attr,'_','|','src','lemmaMM'],
-	      MTRl => [\&to_composed_node_attr,'_','|','src','trlemmaM'],
-	      MDg => [\&to_composed_node_attr,'_','|','src','govMD'],
-	      MDA => [\&to_composed_node_attr,'_','|','src','afunMD'],
-	      coref => [\&to_node_attr,'|','corlemma'],
-	      f => [sub {
-		      my ($s,$data)=@_;
-		      &to_node_attr(@_,'|','form');
-		      unless (exists($s->{node}->{origf})
-			      or
-			      $s->{node}->{formtype} =~ /gen$/
-			     ) {
-			$s->{node}->{origf}=$data;
-		      }
-		    }],
-	      w => [\&to_next_node_attr,'|','origf'],
-	      d => [sub {
-		      my ($s,$data)=@_;
-		      &to_node_attr(@_,'|','form');
-		      unless (exists($s->{node}->{origf})
-			      or
-			      $s->{node}->{formtype} =~ /gen$/
-			     ) {
-			$s->{node}->{origf}=$data;
-		      }
-		    }],
-	      P => [\&to_node_attr,'|','pronunciation'],
-	      Ct => [\&to_node_attr,'|','alltags'],
-	      l => [\&to_node_attr,'|','lemma'],
-	      R => [\&to_node_attr,'|','root'],   # should be src-ed by n parent
-	      E => [\&to_node_attr,'|','ending'], # should be src-ed by n parent
-	      t => [\&to_node_attr,'|','tag'],
-	      A => [\&to_node_attr,'|','afun'],
-	      TRl => [\&to_node_attr,'|','trlemma'],
-	      TRg => [\&to_node_attr,'|','govTR'],
-	      T => [\&to_node_attr,'|','func'],
-	      Tmo => [\&to_node_attr,'|','memberof'],
+              'source' => [\&to_node_attr,'','cstssource'],
+              'mauth' => [sub {
+                my ($s)=@_;
+                if (($s->{elements}->[-3]||'') eq 'h') {
+                  to_attr(@_,'following_root','','cstsmarkup');
+                } else {
+                  to_attr(@_,'following_root','','docmarkup');
+                }
+              }],
+              'mdate' => [sub {
+                my ($s)=@_;
+                if (($s->{elements}->[-3]||'') eq 'h') {
+                  to_attr(@_,'following_root','','cstsmarkup');
+                } else {
+                  to_attr(@_,'following_root','','docmarkup');
+                }
+              }],
+              'mdesc' => [sub {
+                my ($s)=@_;
+                if (($s->{elements}->[-3]||'') eq 'h') {
+                  to_attr(@_,'following_root','','cstsmarkup');
+                } else {
+                  to_attr(@_,'following_root','','docmarkup');
+                }
+              }],
+              'mod' => [\&to_attr,'following_root','','docprolog'],
+              'txtype' => [\&to_attr,'following_root','','docprolog'],
+              'genre' => [\&to_attr,'following_root','','docprolog'],
+              'verse' => [\&to_attr,'following_root','','docprolog'],
+              'med' => [\&to_attr,'following_root','','docprolog'],
+              'authsex' => [\&to_attr,'following_root','','docprolog'],
+              'lang' => [\&to_attr,'following_root','','docprolog'],
+              'transsex' => [\&to_attr,'following_root','','docprolog'],
+              'srclang' => [\&to_attr,'following_root','','docprolog'],
+              'temp' => [\&to_attr,'following_root','','docprolog'],
+              'firsted' => [\&to_attr,'following_root','','docprolog'],
+              'authname' => [\&to_attr,'following_root','','docprolog'],
+              'transname' => [\&to_attr,'following_root','','docprolog'],
+              'opus' => [\&to_attr,'following_root','','docprolog'],
+              'id' => [\&to_attr,'following_root','','docprolog'],
+              'i' => [\&to_node_attr,'','!GAP'],
+              'iref' => [\&to_node_attr,'','!GAP'],
+              MDt => [\&to_composed_node_attr,'_','|','src','tagMD'],
+              MDl => [\&to_composed_node_attr,'_','|','src','lemmaMD'],
+              MMt => [sub {
+                        my ($s,$data) = @_;
+                        # dirty hack to have the same number of MMl and MMt values
+                        to_composed_node_attr(@_,'_','|','src','tagMM');
+                        my $name;
+                        for my $a (@{$s->{attributes}[-1]}) {
+                          if ($a->[0] eq 'src') {
+                            $name='MM_'.$a->[1];
+                            last;
+                          }
+                        }
+                        my @l = split /\|/,$s->{node}->{'lemma'.$name};
+                        my @t = split /\|/,$s->{node}->{'tag'.$name};
+                        $s->{node}->{'lemma'.$name}.='|'.$l[$#l] if (@l == scalar(@t)-1);
+                      }],
+              MMl => [\&to_composed_node_attr,'_','|','src','lemmaMM'],
+              MTRl => [\&to_composed_node_attr,'_','|','src','trlemmaM'],
+              MDg => [\&to_composed_node_attr,'_','|','src','govMD'],
+              MDA => [\&to_composed_node_attr,'_','|','src','afunMD'],
+              coref => [\&to_node_attr,'|','corlemma'],
+              f => [sub {
+                      my ($s,$data)=@_;
+                      &to_node_attr(@_,'|','form');
+                      unless (exists($s->{node}->{origf})
+                              or
+                              $s->{node}->{formtype} =~ /gen$/
+                             ) {
+                        $s->{node}->{origf}=$data;
+                      }
+                    }],
+              w => [\&to_next_node_attr,'|','origf'],
+              d => [sub {
+                      my ($s,$data)=@_;
+                      &to_node_attr(@_,'|','form');
+                      unless (exists($s->{node}->{origf})
+                              or
+                              $s->{node}->{formtype} =~ /gen$/
+                             ) {
+                        $s->{node}->{origf}=$data;
+                      }
+                    }],
+              P => [\&to_node_attr,'|','pronunciation'],
+              Ct => [\&to_node_attr,'|','alltags'],
+              l => [\&to_node_attr,'|','lemma'],
+              R => [\&to_node_attr,'|','root'],   # should be src-ed by n parent
+              E => [\&to_node_attr,'|','ending'], # should be src-ed by n parent
+              t => [\&to_node_attr,'|','tag'],
+              A => [\&to_node_attr,'|','afun'],
+              TRl => [\&to_node_attr,'|','trlemma'],
+              TRg => [\&to_node_attr,'|','govTR'],
+              T => [\&to_node_attr,'|','func'],
+              Tmo => [\&to_node_attr,'|','memberof'],
               Tpa => [\&to_node_attr,'|','parenthesis'],
               Top => [\&to_node_attr,'|','operand'],
-	      grm => [\&to_node_attr,'|','gram'],
-	      TRt => [\&assign_TRt,0],
-	      tfa => [\&to_node_attr,'|','tfa'],
-	      tfr => [\&to_node_attr,'|','dord'],
-	      fw => [\&to_node_attr,'|','fw'],
-	      phr => [\&to_node_attr,'|','phraseme'],
-	      Tframeid => [\&to_node_attr,'|','frameid'],
-	      Tframere => [\&to_node_attr,'|','framere'],
-	      g => [sub{
-		      my ($s,$data)=@_;
-		      to_node_attr(@_);
-		      $s->{node}->{govTR}=$data if $s->{node}->{govTR} eq "";
-		    },'|','ordorig'],
-	      r => [\&to_node_attr,'|','ord'],
-	      x => [sub {
-		      my ($s,$data)=@_;
-		      to_composed_node_attr($s,$data,"x_","","name","");
-		    }],
-	     );
+              grm => [\&to_node_attr,'|','gram'],
+              TRt => [\&assign_TRt,0],
+              tfa => [\&to_node_attr,'|','tfa'],
+              tfr => [\&to_node_attr,'|','dord'],
+              fw => [\&to_node_attr,'|','fw'],
+              phr => [\&to_node_attr,'|','phraseme'],
+              Tframeid => [\&to_node_attr,'|','frameid'],
+              Tframere => [\&to_node_attr,'|','framere'],
+              g => [sub{
+                      my ($s,$data)=@_;
+                      to_node_attr(@_);
+                      $s->{node}->{govTR}=$data if $s->{node}->{govTR} eq "";
+                    },'|','ordorig'],
+              r => [\&to_node_attr,'|','ord'],
+              x => [sub {
+                      my ($s,$data)=@_;
+                      to_composed_node_attr($s,$data,"x_","","name","");
+                    }],
+             );
 
 our (@csts,@misc,@minARheader,@minTRheader,@ARspecial,@ARheader,@PADTattributes,@PADTARheader,@TRheader);
 
@@ -594,13 +594,13 @@ our @ARheader = (
 );
 
 @PADTARheader= (
-		(map { my $x=$_; $x=~s/^(\@L[0-9]?\s*afun\|)(.*)$/$1---|Pred|Pnom|Sb|Obj|Atr|Adv|AtrAdv|AdvAtr|Coord|Ref|AtrObj|ObjAtr|AtrAtr|AuxP|Apos|ExD|Atv|Ante|AuxC|AuxO|AuxE|AuxY|AuxM|AuxG|AuxK|AuxX|AuxS|Generated|NA|???/; $x } @minARheader),
-		@ARspecial,
-		@PADTattributes,
-		@minTRheader,
-		@csts,
-		@misc
-	       );
+                (map { my $x=$_; $x=~s/^(\@L[0-9]?\s*afun\|)(.*)$/$1---|Pred|Pnom|Sb|Obj|Atr|Adv|AtrAdv|AdvAtr|Coord|Ref|AtrObj|ObjAtr|AtrAtr|AuxP|Apos|ExD|Atv|Ante|AuxC|AuxO|AuxE|AuxY|AuxM|AuxG|AuxK|AuxX|AuxS|Generated|NA|???/; $x } @minARheader),
+                @ARspecial,
+                @PADTattributes,
+                @minTRheader,
+                @csts,
+                @misc
+               );
 
 @TRheader = (
  @minARheader,
@@ -682,7 +682,7 @@ sub build_tree {
   if ($fill_empty_ord) {
     foreach (@_) {
       if ($_->{$ord} eq "") {
-	$_->{$ord}=$_->{$sentord};
+        $_->{$ord}=$_->{$sentord};
       }
     }
   }
@@ -828,17 +828,17 @@ sub read {
   my (@elements, $next_attributes, @attributes);
   $next_attributes=[];
   my $state = {
-	       elements => \@elements,      # element name stack
-	       attributes => \@attributes,  # element attribute-list stack
-	       file => undef, # fixme
-	       event => undef,
-	       root => undef,
-	       following_root => {},
-	       node => undef,
-	       following => {},
-	       trees => [],
-	       nodes => []
-	      };
+               elements => \@elements,      # element name stack
+               attributes => \@attributes,  # element attribute-list stack
+               file => undef, # fixme
+               event => undef,
+               root => undef,
+               following_root => {},
+               node => undef,
+               following => {},
+               trees => [],
+               nodes => []
+              };
 
   my $document_is_conforming=0;
   # we parse the the output of nsgmls
@@ -851,28 +851,28 @@ sub read {
       push @elements, $data;
       push @attributes, $next_attributes;
       if (exists($start_tag{$data})) {
-	my ($cb,@args)=@{ $start_tag{$data} };
-	&$cb($state,$data,@args);
+        my ($cb,@args)=@{ $start_tag{$data} };
+        &$cb($state,$data,@args);
       }
       for my $attribute (@$next_attributes) {
-	if (exists $att{"$data $attribute->[0]"}) {
-	  my ($cb,@args)=@{ $att{"$data $attribute->[0]"} };
-	  &$cb($state,$attribute->[1],@args);
-	}
+        if (exists $att{"$data $attribute->[0]"}) {
+          my ($cb,@args)=@{ $att{"$data $attribute->[0]"} };
+          &$cb($state,$attribute->[1],@args);
+        }
       }
       $next_attributes=[];
     } elsif ($type eq ')') { # end element
       if (exists($end_tag{$data})) {
-	my ($cb,@args)=@{ $end_tag{$data} };
-	&$cb($state,$data,@args);
+        my ($cb,@args)=@{ $end_tag{$data} };
+        &$cb($state,$data,@args);
       }
       pop @elements;
       pop @attributes;
     } elsif ($type eq '-') { # character data
       my $element = $elements[-1];
       if (exists($pcdata{$element})) {
-	my ($cb,@args)=@{ $pcdata{$element} };
-	&$cb($state,unescape_data($data),@args);
+        my ($cb,@args)=@{ $pcdata{$element} };
+        &$cb($state,unescape_data($data),@args);
       }
     } elsif ($type eq 'A') { # attribute of the next element
       my ($name,$value)= $data=~m{^(\S+) (?:IMPLIED$|(?:CDATA|NOTATION|ENTITY|TOKEN|ID) (.*))};
@@ -901,7 +901,7 @@ sub setupTR {
   $initial_node_values{TR}='hide';
   $initial_root_values{reserve1}='TR_TREE';
   $fs_tail='(2,3)';
-  @fs_patterns=();		# proper patterns added by TrEd's hook
+  @fs_patterns=();                # proper patterns added by TrEd's hook
   $fs_hint=undef;
 
 }
@@ -920,9 +920,9 @@ sub setupPADTAR {
   setupAR();
   $header = \@PADTARheader;
   @fs_patterns=('${form}',
-		'#{custom1}<? join "_", map { "\${$_}" }'.
+                '#{custom1}<? join "_", map { "\${$_}" }'.
                 '   grep { $this->{$_}=~/./ && $this->{$_}!~/^no-/ }'.
-	        '   qw(afun parallel paren arabfa arabspec arabclause) ?>');
+                '   qw(afun parallel paren arabfa arabspec arabclause) ?>');
   $fs_hint="tag:\t\${tag}\nlemma:\t\${lemma}\ngloss:\t\${x_gloss}\ncommentA:\t\${commentA}";
 }
 
@@ -937,12 +937,12 @@ sub setupSpec {
     }
     if (@_>2) {
       if ($_[2] ne "") {
-	@$header = ((grep !/\@[H]/,@$header) , '@H '.$_[2]);
+        @$header = ((grep !/\@[H]/,@$header) , '@H '.$_[2]);
       } else {
-	# backward in-compatibility: empty => use X_hide
-	# old behavior: always use X_hide
-	@$header = ((grep !/\@[H]/,@$header) , '@H X_hide');
-	$initial_node_values{X_hide}='hide';
+        # backward in-compatibility: empty => use X_hide
+        # old behavior: always use X_hide
+        @$header = ((grep !/\@[H]/,@$header) , '@H X_hide');
+        $initial_node_values{X_hide}='hide';
       }
     }
   }
