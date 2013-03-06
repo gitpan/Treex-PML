@@ -55,6 +55,7 @@ lib/Treex/PML/Struct.pm
 Makefile.PL
 MANIFEST
 META.yml
+META.json
 README
 t/00-load.t
 t/01-pml.t

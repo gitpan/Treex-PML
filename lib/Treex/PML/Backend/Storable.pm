@@ -6,7 +6,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.13'; # version template
+  $VERSION='2.14'; # version template
 }
 use UNIVERSAL::DOES;
 use Scalar::Util qw(blessed reftype refaddr);
