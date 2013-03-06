@@ -20,7 +20,11 @@ use Treex::PML;
 use Cwd qw(abs_path);
 
 SKIP: {
-  skip("XML::LibXSLT not available", PLAN) unless eval{ require XML::LibXSLT; 1; };
+  skip('XML::LibXSLT not available', PLAN) unless eval{ require XML::LibXSLT; 1; };
+  if (grep 10127 == $_, XML::LibXSLT::LIBXSLT_VERSION(), XML::LibXSLT::LIBXSLT_RUNTIME_VERSION()) {
+      diag('Buggy libxslt 1.1.27');
+      skip('Buggy libxslt 1.1.27', PLAN);
+  }
 
   Treex::PML::AddResourcePath(abs_path(File::Spec->catfile('test_data','alpino')));
   Treex::PML::UseBackends('PML','PMLTransform'); # default will be PML

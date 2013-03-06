@@ -12,7 +12,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.12'; # version template
+  $VERSION='2.13'; # version template
 }
 
 sub test {
@@ -149,7 +149,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.12'; # version template
+  $VERSION='2.13'; # version template
 }
 use Treex::PML;
 
