@@ -11,7 +11,7 @@ use Carp;
 use Data::Dumper;
 
 BEGIN {
-  our $VERSION = '2.14'; # version template
+  our $VERSION = '2.014_001'; # version template
 }
 use List::Util qw(first);
 use Scalar::Util qw(weaken);

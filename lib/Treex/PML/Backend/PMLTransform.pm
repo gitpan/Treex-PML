@@ -2,7 +2,7 @@ package Treex::PML::Backend::PMLTransform;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.14'; # version template
+  $VERSION='2.014_001'; # version template
 }
 
 use Treex::PML::Backend::PML qw(open_backend close_backend read write);
@@ -39,6 +39,11 @@ L<Treex::PML::Instance/"CONFIGURATION"> for details.
 WARNING: since this backend accepts every XML file, it should be added as
 the last backend (otherwise other backends working with XML will not
 be tried).
+
+=head2 BUGS
+
+If your system uses libxslt version 1.1.27, the XSLT transformation
+does not work. Upgrade your system.
 
 =head1 COPYRIGHT AND LICENSE
 

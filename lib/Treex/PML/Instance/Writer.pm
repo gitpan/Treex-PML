@@ -10,13 +10,21 @@ use Scalar::Util qw(blessed);
 use UNIVERSAL::DOES;
 
 BEGIN {
-  our $VERSION = '2.14'; # version template
+  our $VERSION = '2.014_001'; # version template
 }
 use List::Util qw(first);
 use Treex::PML::Instance::Common qw(:diagnostics :constants);
 use Treex::PML::Schema;
 use Treex::PML::IO qw(open_backend close_backend rename_uri);
 use Encode;
+
+
+my $BUG;
+eval {
+    require XML::LibXSLT;
+    $BUG = grep 10127 == $_, XML::LibXSLT::LIBXSLT_VERSION(),
+                             XML::LibXSLT::LIBXSLT_RUNTIME_VERSION();
+};
 
 my (
   %handlers,
@@ -245,6 +253,7 @@ sub save {
   die $@ if $@;
 
   if ($xsl_source and $out_xsl_href) {
+    die "Buggy libxslt version 10127\n" if $BUG;
     my $xslt = XML::LibXSLT->new;
     my $params = $out_xsl->content;
     my %params;
