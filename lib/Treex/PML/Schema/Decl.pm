@@ -9,7 +9,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.015'; # version template
+  $VERSION='2.16'; # version template
 }
 no warnings 'uninitialized';
 use Scalar::Util qw( weaken );

@@ -12,7 +12,7 @@ use Carp;
 use Treex::PML::Schema::Constants;
 
 BEGIN {
-  our $VERSION = '2.015'; # version template
+  our $VERSION = '2.16'; # version template
   require Exporter;
   import Exporter qw(import);
   our @EXPORT = (
