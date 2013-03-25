@@ -24,7 +24,7 @@ use strict;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.014_001'; # version template
+  $VERSION='2.015'; # version template
 }
 use base qw(Treex::PML::Struct);
 

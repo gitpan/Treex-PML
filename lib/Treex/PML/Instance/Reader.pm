@@ -11,7 +11,7 @@ use Carp;
 use Data::Dumper;
 
 BEGIN {
-  our $VERSION = '2.014_001'; # version template
+  our $VERSION = '2.015'; # version template
 }
 use List::Util qw(first);
 use Scalar::Util qw(weaken);
@@ -257,6 +257,7 @@ sub load {
             and (!$transform->{root} or $transform->{root} eq $root_element)
             and !$test or eval { $dom->find($test) }) {
           if ($type eq 'xslt') {
+            die "Buggy libxslt version 10127\n" if XSLT_BUG;
             if (eval { require XML::LibXSLT; 1 }) {
               my $in_xsl_href = URI->new(Encode::encode_utf8($in_xsl->get_member('href')));
               next unless $in_xsl_href;
@@ -380,7 +381,7 @@ sub load {
            (map {
              my $ids = $ctxt->{'_refnames'}->{$_};
              my $val = $sel->{$_};
-             map { $_=>$val } 
+             map { $_=>$val }
                defined($ids) ? (ref($ids) ? @$ids : ($ids)) : ()
            } keys %$sel) : ())
         };
@@ -483,7 +484,7 @@ sub read_header {
               Treex::PML::Factory->createPMLSchema({
                 filename => $schema_path,
                 use_resources => 1,
-                revision_error => 
+                revision_error =>
                   "Error: ".$ctxt->{'_filename'}." requires different revision of PML schema %f: %e\n",
                 %a, # revision_opts
               });
@@ -495,7 +496,7 @@ sub read_header {
             reader=>$reader,
             base_url => $ctxt->{'_filename'},
             use_resources => 1,
-            revision_error => 
+            revision_error =>
               "Error: ".($ctxt->{'_filename'}||'document')." requires different revision of PML schema %f: %e\n",
             %a, # revision_opts
           });
@@ -538,7 +539,7 @@ sub read_header {
       }
     }
   }
-  $ctxt->{'_schema'} or 
+  $ctxt->{'_schema'} or
     die "Did not find <schema> element in PML <head>: the document '".$ctxt->{_filename}."' is not a valid PML instance!";
   $ctxt->{'_references'} = \%references;
   $ctxt->{'_refnames'} = \%named_references;
@@ -1346,7 +1347,7 @@ sub compile_schema {
                  _report_error(q(Unexpected text content in an alt: '`.$path.q`' at ).$pml_file.' line '.$p->[XAT_LINE]);
               }
             }
-            return @alt == 0 ? undef : @alt == 1 ? $alt[0] : 
+            return @alt == 0 ? undef : @alt == 1 ? $alt[0] :
                #return bless \@alt, 'Treex::PML::Alt';
                Treex::PML::Factory->createAlt(\@alt,1);
           }
@@ -1486,7 +1487,7 @@ sub compile_schema {
             } else {
               $text=$p;
             }
-            !(defined($text) and length($text)) or ($text eq "`.$value.q`") or 
+            !(defined($text) and length($text)) or ($text eq "`.$value.q`") or
                  _report_error(qq(Invalid value '$text' in element <).$p->[XAT_NAME].q(> of constant type '`.$path.q`' at ).$pml_file.' line '.$p->[XAT_LINE]);
             return $text;
          }`;

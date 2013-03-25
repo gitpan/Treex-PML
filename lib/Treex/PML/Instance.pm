@@ -75,7 +75,7 @@ $EXPORT_TAGS{'all'} = [ @{ $EXPORT_TAGS{'constants'} },
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(  );
-our $VERSION = '2.014_001'; # version template
+our $VERSION = '2.015'; # version template
 
 BEGIN {
 require Treex::PML::IO;
@@ -1034,7 +1034,7 @@ name of the "<LM>" (list-member) tag
 
 =item AM
 
-name of the "<LM>" (alt-member) tag
+name of the "<AM>" (alt-member) tag
 
 =item PML_NS
 

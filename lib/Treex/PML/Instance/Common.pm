@@ -1,7 +1,7 @@
 package Treex::PML::Instance::Common;
 
 use 5.008;
-use strict; 
+use strict;
 use warnings;
 use Carp;
 
@@ -10,21 +10,28 @@ import Exporter qw( import );
 
 our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (
-  'diagnostics' => [ qw( _die _warn _debug DEBUG ) ],
+  'diagnostics' => [ qw( _die _warn _debug DEBUG XSLT_BUG ) ],
   'constants' => [ qw( LM AM PML_NS SUPPORTED_PML_VERSIONS ) ],
 );
 $EXPORT_TAGS{'all'} = [
   @{ $EXPORT_TAGS{'constants'} },
   @{ $EXPORT_TAGS{'diagnostics'} },
-  qw( $DEBUG SUPPORTED_PML_VERSIONS )
+  qw( $DEBUG $XSLT_BUG SUPPORTED_PML_VERSIONS )
 ];
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(  );
-our $VERSION = '2.014_001'; # version template
+our $VERSION = '2.015'; # version template
 
 
 our $DEBUG = $ENV{PML_DEBUG}||0;
+
+our $XSLT_BUG=0;
+eval {
+    require XML::LibXSLT;
+    $XSLT_BUG = grep 10127 == $_, XML::LibXSLT::LIBXSLT_VERSION(),
+                                  XML::LibXSLT::LIBXSLT_RUNTIME_VERSION();
+};
 
 use constant LM => 'LM';
 use constant AM => 'AM';
@@ -34,6 +41,10 @@ use constant SUPPORTED_PML_VERSIONS => " 1.1 1.2 ";
 ###################################
 # DIAGNOSTICS
 ###################################
+
+sub XSLT_BUG {
+  return $XSLT_BUG;
+}
 
 sub DEBUG {
   if (@_) { $DEBUG=$_[0] };
@@ -101,6 +112,11 @@ This module is not intended for direct use.
 
 Set or get current debug level.
 
+=item XSLT_BUG
+
+Returns 1 if the version of the underlying XSLT library is 1.1.27
+which cannot be used because it contains a serious bug.
+
 =back
 
 =head1 SEE ALSO
@@ -120,4 +136,3 @@ at your option, any later version of Perl 5 you may have available.
 None reported... yet.
 
 =cut
-
