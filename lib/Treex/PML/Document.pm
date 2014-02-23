@@ -904,7 +904,7 @@ sub deleteIDHashEntry {
 
 =item $document->hashNodeByID($node)
 
- a node by its #ID. Note that the ID-hash is created when the
+Hash a node by its #ID. Note that the ID-hash is created when the
 document is loaded (and if not, when first queried), but is not
 maintained by this class. It must therefore be maintained by the
 application.

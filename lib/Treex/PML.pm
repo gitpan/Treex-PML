@@ -16,7 +16,7 @@ package Treex::PML;
 use vars qw(@EXPORT @EXPORT_OK @ISA $VERSION $API_VERSION %COMPATIBLE_API_VERSION
             $FSError $Debug $resourcePath $resourcePathSplit @BACKENDS);
 BEGIN {
-$VERSION = "2.16";        # change when new functions are added etc
+$VERSION = "2.17";        # change when new functions are added etc
 }
 
 
@@ -173,10 +173,14 @@ sub CloneValue {
       if (UNIVERSAL::can('Data::Dumper','init_refaddr_format')) {
         Data::Dumper::init_refaddr_format();
       }
+# Sometimes occurs, that $new->[1] is undef. This bug appeared randomly, due to reimplimentation of hash in perl5.18 (http://perldoc.perl.org/perldelta.html#Hash-overhaul.
+# In previous versions it did not appear, thanks to hash order "new->[1]" < "new->[0]"
       my $dump=Data::Dumper->new([$what],
-				 ['val'])
-	->Seen({map { ref($old->[$_]) ? (qq{new->[$_]} => $old->[$_]) : () } 0..$#$old})
-	->Purity(1)->Indent(0)->Dump;
+        		                                         ['val'])
+	 ->Seen({map { (ref($old->[$_]) 
+	                               and defined($new->[$_]) # bugfix
+	                              )? (qq{new->[$_]} => $old->[$_]) : () } 0..$#$old})
+	 ->Purity(1)->Indent(0)->Dump;
       eval $dump;
       die $@ if $@;
     } else {

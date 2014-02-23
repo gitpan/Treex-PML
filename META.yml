@@ -6,9 +6,9 @@ build_requires:
   Module::Build: 0.36
   Test::More: 0
 configure_requires:
-  Module::Build: 0.40
+  Module::Build: 0.39
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Treex-PML
 provides:
   Treex::PML:
     file: lib/Treex/PML.pm
-    version: 2.16
+    version: 2.17
   Treex::PML::Alt:
     file: lib/Treex/PML/Alt.pm
     version: 2.16
@@ -193,4 +193,4 @@ requires:
   perl: v5.8.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 2.16
+version: 2.17
